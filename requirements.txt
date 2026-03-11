@@ -1,0 +1,16 @@
+flask==3.0.3
+flask-cors==4.0.1
+python-dotenv==1.0.1
+gunicorn==22.0.0
+
+# CrewAI + LiteLLM (handles Groq under the hood)
+crewai==0.80.0
+crewai-tools==0.14.0
+
+# Groq via LiteLLM — no extra package needed, LiteLLM is bundled with crewai
+# If you see ImportError for langchain_groq, uncomment the line below:
+# langchain-groq==0.2.4
+
+# Data handling
+pandas==2.2.3
+numpy==1.26.4

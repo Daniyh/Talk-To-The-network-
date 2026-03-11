@@ -1,0 +1,20 @@
+# Python
+.env
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.DS_Store
+logs/
+*.log
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+frontend/out/
+frontend/.turbo/

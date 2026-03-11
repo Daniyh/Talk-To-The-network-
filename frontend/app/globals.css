@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+:root {
+  --bg-primary:   #050B18;
+  --bg-secondary: #0A1628;
+  --bg-card:      #0D1F35;
+  --border:       #1A3050;
+  --accent-cyan:  #00D4FF;
+  --accent-blue:  #0066FF;
+  --healthy:      #00E5A0;
+  --warning:      #FFB800;
+  --critical:     #FF4444;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background-color: var(--bg-primary);
+  color: #E8F4FD;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb  { background: #2A4A70; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* ── Reusable utility classes ───────────────────────────────────────────── */
+@layer components {
+
+  .card {
+    @apply bg-bg-card border border-border rounded-xl p-4;
+    box-shadow: 0 0 0 1px #1A3050, 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .card-glow {
+    @apply card;
+    box-shadow: 0 0 0 1px #1A3050, 0 4px 24px rgba(0,0,0,0.4),
+                0 0 30px rgba(0,212,255,0.07);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg
+           bg-accent-blue text-white font-medium text-sm
+           transition-all duration-200
+           hover:bg-blue-500 hover:shadow-glow active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg
+           bg-bg-hover border border-border text-text-primary font-medium text-sm
+           transition-all duration-200
+           hover:border-accent-cyan hover:text-accent-cyan active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+           text-xs font-medium;
+  }
+
+  .badge-healthy  { @apply badge bg-status-healthy/15  text-status-healthy; }
+  .badge-warning  { @apply badge bg-status-warning/15  text-status-warning; }
+  .badge-critical { @apply badge bg-status-critical/15 text-status-critical; }
+
+  .live-dot {
+    @apply inline-block w-2 h-2 rounded-full bg-status-healthy;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  .section-title {
+    @apply text-xs font-semibold tracking-widest uppercase text-text-secondary;
+  }
+
+  .stat-value {
+    @apply font-mono text-2xl font-semibold text-text-primary;
+  }
+
+  .stat-label {
+    @apply text-xs text-text-secondary mt-0.5;
+  }
+}
+
+/* ── Topology SVG ────────────────────────────────────────────────────────── */
+.topology-link { stroke: #1A3050; stroke-width: 1.5; opacity: 0.6; }
+.topology-link.active { stroke: var(--accent-cyan); opacity: 0.35; }
+
+.cell-node circle.ring {
+  fill: none;
+  stroke-width: 1;
+  animation: pulse-ring 2.5s cubic-bezier(0.455,0.03,0.515,0.955) infinite;
+}
+
+/* ── Sidebar nav ─────────────────────────────────────────────────────────── */
+.nav-link {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+         text-text-secondary transition-all duration-150
+         hover:text-text-primary hover:bg-bg-hover;
+}
+.nav-link.active {
+  @apply text-accent-cyan bg-accent-cyan/10;
+  box-shadow: inset 3px 0 0 var(--accent-cyan);
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  50%  { transform: scale(1.5); opacity: 0.2; }
+  100% { transform: scale(1);   opacity: 0.7; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.animate-fade-in { animation: fade-in 0.35s ease-out both; }
