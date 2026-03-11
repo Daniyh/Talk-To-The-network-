@@ -10,10 +10,26 @@ Agents:
 """
 
 import os
+import sys
 import json
 import logging
 import traceback
 from flask import Flask, request, jsonify
+
+# CrewAI prints Unicode characters (→, ✓, etc.) that crash on Windows
+# terminals using cp1252. Patch builtins.print to silently drop bad chars.
+import builtins
+_orig_print = builtins.print
+def _safe_print(*args, **kwargs):
+    try:
+        _orig_print(*args, **kwargs)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        safe = [str(a).encode('ascii', 'replace').decode('ascii') for a in args]
+        try:
+            _orig_print(*safe, **kwargs)
+        except Exception:
+            pass
+builtins.print = _safe_print
 from flask_cors import CORS
 from dotenv import load_dotenv
 
