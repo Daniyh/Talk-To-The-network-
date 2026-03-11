@@ -4,12 +4,12 @@ python-dotenv==1.0.1
 gunicorn==22.0.0
 
 # CrewAI + LiteLLM (handles Groq under the hood)
+# crewai-tools is intentionally excluded — it pulls langchain/openai/embedchain
+# which break Railway builds. Only crewai core is needed.
 crewai==0.80.0
-crewai-tools==0.14.0
 
-# Groq via LiteLLM — no extra package needed, LiteLLM is bundled with crewai
-# If you see ImportError for langchain_groq, uncomment the line below:
-# langchain-groq==0.2.4
+# Explicit pydantic pin (crewai dependency, used in csv_tool.py)
+pydantic>=2.0.0,<3.0.0
 
 # Data handling
 pandas==2.2.3
