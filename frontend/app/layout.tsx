@@ -31,7 +31,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 <Wifi size={16} className="text-accent-cyan" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-text-primary leading-tight">5G Network</p>
+                <p className="text-sm font-semibold text-text-primary leading-tight">5G Advanced Network</p>
                 <p className="text-[10px] text-accent-cyan tracking-widest uppercase font-semibold">Talk to the Network</p>
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Talk to the Network — 5G AI Optimizer</title>
+        <title>Talk to the Network — 5G Advanced AI Optimizer</title>
         <meta name="description" content="Talk to the Network — Intent-Based 5G-Advanced Network Optimizer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>

@@ -32,7 +32,7 @@ export default function IntentPage() {
           <div>
             <h1 className="text-lg font-semibold text-text-primary">Intent AI</h1>
             <p className="text-xs text-text-secondary mt-0.5">
-              Natural language → 5G network configuration
+              Natural language → 5G Advanced network configuration
             </p>
           </div>
           <div className="ml-auto flex gap-2">
