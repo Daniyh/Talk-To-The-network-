@@ -257,17 +257,86 @@ def build_fallback_optimization(monitor: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Safety fallback
+# ---------------------------------------------------------------------------
+
+def build_fallback_safety(config: dict, intent: dict) -> dict:
+    """Rule-based safety check used when the LLM Safety Validator agent fails."""
+    checks = []
+    warnings = []
+    verdict = "approved"
+
+    slice_data = config.get("network_slice", {})
+    qos = config.get("qos_parameters", {})
+    ran = config.get("ran_configuration", {})
+    entities = intent.get("entities", {})
+
+    bw = slice_data.get("allocated_bandwidth_mbps", 0)
+    lat = slice_data.get("latency_target_ms", 999)
+    slice_type = slice_data.get("type", "eMBB")
+    users = entities.get("expected_users", 0)
+    active_cells = ran.get("active_cells", 1)
+
+    # Check 1: bandwidth cap (1000 Mbps max per slice)
+    passed = bw <= 1000
+    checks.append({"name": "bandwidth_limit", "passed": passed,
+                   "detail": f"{bw} Mbps {'within' if passed else 'exceeds'} 1000 Mbps maximum per slice"})
+    if not passed:
+        verdict = "rejected"
+
+    # Check 2: latency feasibility
+    lat_limits = {"URLLC": 10, "eMBB": 100, "mMTC": 300}
+    lat_max = lat_limits.get(slice_type, 100)
+    passed = lat <= lat_max
+    checks.append({"name": "latency_feasibility", "passed": passed,
+                   "detail": f"{lat} ms target {'achievable' if passed else 'not achievable'} for {slice_type} (max {lat_max} ms)"})
+    if not passed:
+        verdict = "rejected"
+
+    # Check 3: capacity (each cell handles ~1000 concurrent users)
+    capacity = active_cells * 1000
+    passed = users <= capacity
+    checks.append({"name": "capacity_check", "passed": passed,
+                   "detail": f"{users} users vs {capacity} capacity ({active_cells} cells × 1000)"})
+    if not passed:
+        warnings.append(f"Requested user count ({users}) exceeds estimated cell capacity ({capacity}). Consider activating more cells.")
+        if verdict == "approved":
+            verdict = "approved_with_warnings"
+
+    # Check 4: 5QI consistency
+    expected_5qi = {"eMBB": [9, 8, 7], "URLLC": [82, 83, 1, 2], "mMTC": [79, 70]}
+    actual_5qi = qos.get("5qi", 0)
+    passed = actual_5qi in expected_5qi.get(slice_type, [])
+    checks.append({"name": "qos_consistency", "passed": passed,
+                   "detail": f"5QI {actual_5qi} {'consistent' if passed else 'inconsistent'} with {slice_type} slice type"})
+    if not passed:
+        warnings.append(f"5QI value {actual_5qi} may not be optimal for {slice_type}.")
+        if verdict == "approved":
+            verdict = "approved_with_warnings"
+
+    return {
+        "verdict": verdict,
+        "checks": checks,
+        "warnings": warnings,
+        "rejection_reason": next((c["detail"] for c in checks if not c["passed"] and verdict == "rejected"), None),
+        "validated_by": "Rule-based Fallback Safety Validator",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Combined helper
 # ---------------------------------------------------------------------------
 
 def build_fallback_result(user_intent: str) -> dict:
     intent = build_fallback_intent(user_intent)
     config = build_fallback_config(intent)
+    safety = build_fallback_safety(config, intent)
     monitor = build_fallback_monitor()
     optimization = build_fallback_optimization(monitor)
     return {
         "intent": intent,
         "config": config,
+        "safety": safety,
         "monitor": monitor,
         "optimization": optimization,
         "fallback": True,

@@ -68,7 +68,7 @@ def health():
         "service": "RAN Optimizer Backend (CrewAI)",
         "groq_configured": groq_key_set,
         "model": "llama-3.3-70b-versatile",
-        "agents": ["Intent Parser", "RAN Planner", "Network Monitor", "RAN Optimizer"]
+        "agents": ["Intent Parser", "RAN Planner", "Safety Validator", "Network Monitor", "RAN Optimizer"]
     })
 
 

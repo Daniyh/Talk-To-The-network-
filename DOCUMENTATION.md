@@ -1,11 +1,11 @@
 # RAN Optimization Dashboard
-### AI-Powered Intent-Based Network Management for 5G Heterogeneous Networks
+### AI-Powered Intent-Based Network Management for 5G Advanced (3GPP Release 18) Heterogeneous Networks
 
 ---
 
 > **Abstract**
 >
-> The RAN Optimization Dashboard is a full-stack, AI-powered web application that brings the principles of Intent-Based Networking (IBN) to life in a 5G Radio Access Network (RAN) environment. Network engineers express their operational goals in plain natural language — such as *"Prioritize emergency communications at the central hospital now"* — and a four-stage autonomous AI pipeline transforms that intent into a structured, standards-compliant network optimization plan. The system analyzes real network KPIs drawn from a 6G Heterogeneous Network dataset, generates 3GPP Release 18 configurations, visualizes affected cells on an interactive topology map, and quantifies the performance improvement through before/after KPI comparisons. This document covers the theoretical foundations, system architecture, implementation details, dataset requirements, API specification, and deployment procedures.
+> The RAN Optimization Dashboard is a full-stack, AI-powered web application that brings the principles of Intent-Based Networking (IBN) to life in a 5G Advanced Radio Access Network (RAN) environment. Network engineers express their operational goals in plain natural language — such as *"Prioritize emergency communications at the central hospital now"* — and a four-stage autonomous AI pipeline transforms that intent into a structured, standards-compliant network optimization plan. The system analyzes real network KPIs drawn from a 6G Heterogeneous Network dataset, generates 3GPP Release 18 configurations, visualizes affected cells on an interactive topology map, and quantifies the performance improvement through before/after KPI comparisons. This document covers the theoretical foundations, system architecture, implementation details, dataset requirements, API specification, and deployment procedures.
 
 ---
 
@@ -13,7 +13,7 @@
 
 1. [Introduction](#1-introduction)
 2. [Background and Theoretical Foundations](#2-background-and-theoretical-foundations)
-   - 2.1 Telecommunications and the Evolution to 5G
+   - 2.1 Telecommunications: From 5G to 5G Advanced
    - 2.2 Radio Access Networks (RAN)
    - 2.3 Heterogeneous Networks (HetNet)
    - 2.4 Key Performance Indicators in RAN
@@ -44,7 +44,7 @@
 
 ## 1. Introduction
 
-The management of modern mobile networks is one of the most complex challenges in the telecommunications industry. A single 5G deployment may involve thousands of radio cells spread across a city, each continuously generating streams of performance data — throughput, latency, packet loss, signal quality — that operators must monitor and act upon in near real time. When a major event fills a stadium, when a hospital requires ultra-reliable low-latency communication for remote surgery, or when a factory floor deploys hundreds of IoT sensors simultaneously, the network must adapt dynamically and precisely.
+The management of modern mobile networks is one of the most complex challenges in the telecommunications industry. A single 5G Advanced deployment may involve thousands of radio cells spread across a city, each continuously generating streams of performance data — throughput, latency, packet loss, signal quality — that operators must monitor and act upon in near real time. When a major event fills a stadium, when a hospital requires ultra-reliable low-latency communication for remote surgery, or when a factory floor deploys hundreds of IoT sensors simultaneously, the network must adapt dynamically and precisely.
 
 Traditionally, this adaptation has required highly skilled radio frequency (RF) engineers to manually translate operational goals into low-level network configuration commands. This process is time-consuming, error-prone, and increasingly unsustainable as network density and complexity grow with each generation of wireless standards.
 
@@ -60,7 +60,7 @@ The result is a system where a network engineer types a single sentence and rece
 
 ## 2. Background and Theoretical Foundations
 
-### 2.1 Telecommunications and the Evolution to 5G
+### 2.1 Telecommunications: From 5G to 5G Advanced
 
 Telecommunications — the transmission of information over distances using electronic means — has undergone rapid generational evolution over the past four decades. Each generation introduced not merely faster speeds, but fundamentally new use cases:
 
@@ -68,16 +68,17 @@ Telecommunications — the transmission of information over distances using elec
 - **2G (1990s):** Digital voice and SMS. Introduction of encryption and global roaming (GSM standard).
 - **3G (2000s):** Mobile data. Web browsing, email, and video calling became possible on handheld devices.
 - **4G LTE (2010s):** Broadband mobile internet. HD video streaming, app ecosystems, and the smartphone revolution.
-- **5G (2020s):** The current generation, defined by three foundational pillars:
+- **5G (2020s, Release 15–17):** The fifth generation, defined by three foundational service pillars:
   - **eMBB (Enhanced Mobile Broadband):** Gigabit-class data rates for consumer applications.
   - **URLLC (Ultra-Reliable Low-Latency Communication):** Sub-millisecond latency for mission-critical applications such as autonomous vehicles and remote surgery.
   - **mMTC (Massive Machine-Type Communication):** Connectivity for billions of IoT devices with minimal power consumption.
+- **5G Advanced (2024+, Release 18):** The evolved phase of 5G standardized under 3GPP Release 18, and the generation this system targets. 5G Advanced extends its predecessor with native AI/ML integration directly into the radio protocol stack, enhanced network energy efficiency and green networking capabilities, expanded URLLC for XR (Extended Reality) and industrial automation, improved network slicing granularity, and advanced positioning accuracy. It is widely considered the bridge between 5G and the future 6G standard, offering operators a path to autonomous, self-optimizing networks — which is precisely the vision that Intent-Based Networking and this system embody.
 
-The **3GPP (3rd Generation Partnership Project)** is the global standards body responsible for defining 5G specifications. Its releases — particularly Release 15 through Release 18 — specify everything from air interface numerology to network slicing architecture, and their parameters form the basis of the configuration outputs generated by this system.
+The **3GPP (3rd Generation Partnership Project)** is the global standards body responsible for defining these specifications. Its Release 18 — the first official 5G Advanced release — specifies everything from enhanced air interface numerology to AI-native network management interfaces, and its parameters form the basis of the configuration outputs generated by this system.
 
 > **[FIGURE 2]** — *5G three-slice architecture diagram: a horizontal bar divided into three labeled bands — eMBB (left, blue), URLLC (center, orange), mMTC (right, green) — each with example use cases listed below. Create as a simple diagram or use any publicly available 3GPP slice illustration.*
 >
-> `![Figure 2: 5G Network Slice Types — eMBB, URLLC, and mMTC](docs/figures/fig2_5g_slices.png)`
+> `![Figure 2: 5G Advanced Network Slice Types — eMBB, URLLC, and mMTC](docs/figures/fig2_5g_slices.png)`
 
 ---
 
@@ -205,57 +206,11 @@ This system accesses Llama 3.3 70B through **Groq's inference API**, which provi
 
 ## 3. System Architecture
 
-The system follows a clean client-server architecture with the AI processing fully encapsulated in the backend. The browser-based frontend handles all visualization and user interaction, communicating with the backend exclusively through a single REST API endpoint.
+The system follows a clean client-server architecture in which all AI processing is fully encapsulated within the backend, keeping the frontend lightweight and focused entirely on visualization and user interaction. The browser-based frontend is built with Next.js [18] and exposes three pages: the Network Monitor at the root route (`/`), which displays the live topology and KPI dashboard; the Intent AI page (`/intent`), where engineers submit natural language intents and review the full pipeline results; and the Dataset Manager (`/dataset`), which allows uploading and inspecting the CSV dataset. All communication between the frontend and backend flows through a single REST API endpoint — `POST /api/intent` — which accepts the intent string and returns the complete four-agent pipeline result as a structured JSON object.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Browser (Next.js)                        │
-│                                                              │
-│  /              Network Monitor (live topology + KPIs)       │
-│  /intent        Intent AI (submit intent → results)          │
-│  /dataset       Dataset Manager (upload / inspect CSV)       │
-└────────────────────────┬─────────────────────────────────────┘
-                         │ HTTP POST /api/intent
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Flask Backend (Python)                      │
-│                                                              │
-│  server.py  →  ran_crew.py  →  CrewAI Sequential Crew        │
-│                                                              │
-│  Agent 1: Intent Parser                                      │
-│    NL text  →  structured intent JSON                        │
-│                    ↓                                         │
-│  Agent 2: RAN Planner                                        │
-│    intent   →  3GPP Release 18 config JSON                   │
-│                    ↓                                         │
-│  Agent 3: Network Monitor                                    │
-│    reads CSV (filtered by location zone) → KPI health JSON   │
-│                    ↓                                         │
-│  Agent 4: RAN Optimizer                                      │
-│    selects action → before/after KPI measurements            │
-│                                                              │
-│  All agents use Groq Llama 3.3 70B via LiteLLM              │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│              6G HetNet Dataset (CSV)                         │
-│  5,000 rows · 50 cells · Location_Tag per cell              │
-│  Zones: hospital | stadium | factory | downtown | residential│
-└─────────────────────────────────────────────────────────────┘
-```
+The backend is a Python Flask application composed of three layers. The entry point, `server.py`, handles HTTP routing, CORS, and error handling. It delegates all AI logic to `ran_crew.py`, which instantiates and runs the CrewAI sequential crew. The crew consists of four specialized agents — Intent Parser, RAN Planner, Network Monitor, and RAN Optimizer — each powered by Groq's Llama 3.3 70B model via the LiteLLM adapter. Beneath the agents sits the `csv_tool.py` module, which exposes the `NetworkDataReader` tool that agents use to query the 6G HetNet dataset. The dataset contains 5,100 time-series measurement rows across 50 unique radio cells, each tagged with a geographic zone label (`hospital`, `stadium`, `factory`, `downtown`, or `residential`) that enables location-aware filtering during AI inference.
 
-**Data flow for an intent submission:**
-
-1. The engineer types a natural language intent in the browser and submits the form.
-2. The frontend sends a `POST /api/intent` request to the Flask backend with the intent string.
-3. The backend instantiates the CrewAI sequential crew and starts Agent 1.
-4. Each agent executes in turn, passing its structured JSON output to the next agent as context.
-5. Agents 3 and 4 additionally call the `NetworkDataReader` tool, which reads and filters the CSV dataset to retrieve real cell KPI data for the relevant location zone.
-6. The backend assembles the four agent outputs into a single result object and returns it as a JSON response.
-7. The frontend renders the result as an intent result card: banner, agent timeline, KPI comparison, configuration table, and highlighted topology.
-
-The frontend also independently loads and processes the CSV dataset in the browser using PapaParse, enabling the Network Monitor page to display live-simulated topology and KPI data entirely client-side — without any additional backend calls.
+When an engineer submits an intent, the request travels from the browser as an HTTP POST to the Flask backend, which immediately hands it to the CrewAI crew. Agent 1 parses the natural language text into a structured intent JSON; Agent 2 uses that output to generate a complete 3GPP Release 18 network configuration; Agent 3 calls the `NetworkDataReader` tool to read real KPI measurements from cells in the relevant location zone and produces a health assessment; and Agent 4 calls the tool a second time — once for the pre-optimization state and once for the post-optimization proxy — to select an optimization action and quantify its KPI impact. Each agent receives the full outputs of all preceding agents as context, forming a progressive chain of reasoning from raw intent to a concrete network action. The backend then assembles all four outputs into a single response object and returns it to the frontend, where it is rendered as the structured Intent Result Card. Additionally, the frontend independently loads and processes the CSV dataset in the browser using PapaParse, enabling the Network Monitor page to display live-simulated topology and KPI data entirely client-side without any further backend calls.
 
 > **[FIGURE 10]** — *End-to-end data flow diagram: a vertical sequence showing (1) Engineer types intent → (2) Browser POST request → (3) Flask server → (4) CrewAI Crew → (5) Agent 1–4 boxes in sequence → (6) CSV Dataset read → (7) JSON response → (8) Browser renders result card. Can be drawn as a swimlane or simple flow diagram.*
 >
@@ -494,7 +449,7 @@ The agent also extracts: affected location entities, urgency level, confidence s
 
 ### Agent 2 — RAN Planner
 
-**Role:** Expert 5G Network Configuration Architect
+**Role:** Expert 5G Advanced Network Configuration Architect
 **Input:** Structured intent JSON from Agent 1
 **Output:** Complete 3GPP Release 18 network configuration JSON
 
@@ -514,7 +469,7 @@ For example, an emergency intent at a hospital would produce a URLLC configurati
 
 ### Agent 3 — Network Monitor
 
-**Role:** 5G Network Operations Center Analyst
+**Role:** 5G Advanced Network Operations Center Analyst
 **Input:** Intent context + location zone (inferred from intent keywords)
 **Tool:** `NetworkDataReader` — reads a real row from the CSV filtered by `Location_Tag`
 **Output:** KPI health assessment JSON with per-metric analysis and overall health score
@@ -745,7 +700,7 @@ After deployment, every push to the main branch triggers an automatic redeploy o
 | Figure | Description | Source |
 |--------|-------------|--------|
 | Fig. 1 | Dashboard overview — Network Monitor page | Screenshot: `localhost:4000` |
-| Fig. 2 | 5G three-slice architecture (eMBB / URLLC / mMTC) | Diagram |
+| Fig. 2 | 5G Advanced three-slice architecture (eMBB / URLLC / mMTC) | Diagram |
 | Fig. 3 | 5G RAN architecture — UE to gNB to 5G Core | Diagram |
 | Fig. 4 | HetNet topology — multi-tier cell visualization with hover | Screenshot: `localhost:4000` |
 | Fig. 5 | KPI Summary Cards — live network averages | Screenshot: `localhost:4000` |

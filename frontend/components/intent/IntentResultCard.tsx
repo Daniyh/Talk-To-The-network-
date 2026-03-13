@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import {
-  CheckCircle, AlertTriangle, TrendingUp, TrendingDown,
+  CheckCircle, XCircle, AlertTriangle, TrendingUp, TrendingDown,
   Activity, Users, Cpu, Building2, Home, Radio,
   Layers, Wifi, Zap, Shield, ArrowRight,
 } from 'lucide-react';
@@ -97,7 +97,7 @@ function PipelineStep({
         >
           {done ? <CheckCircle size={13} /> : step}
         </div>
-        {step < 4 && <div className="w-px flex-1 bg-border mt-1" style={{ minHeight: 16 }} />}
+        {step < 5 && <div className="w-px flex-1 bg-border mt-1" style={{ minHeight: 16 }} />}
       </div>
       <div className="pb-3">
         <p className="text-xs font-semibold text-text-primary">{title}</p>
@@ -126,6 +126,7 @@ export function IntentResultCard({
   const r          = result.result;
   const intent     = r.intent     as Record<string, any> | undefined;
   const config     = r.config     as Record<string, any> | undefined;
+  const safety     = r.safety     as Record<string, any> | undefined;
   const monitor    = r.monitor    as Record<string, any> | undefined;
   const optim      = r.optimization as Record<string, any> | undefined;
   const isFallback = !!r.fallback;
@@ -274,12 +275,72 @@ export function IntentResultCard({
             summary={intent ? `${meta.label} detected · ${sliceType} slice · priority: ${(intent.entities as any)?.priority ?? '—'}` : 'Parsing intent…'} />
           <PipelineStep step={2} title="RAN Planner" done={!!config?.generated_by}
             summary={config ? `5QI=${qos['5qi'] ?? '—'} · μ${ranConf.numerology ?? '—'} · ${ranConf.mimo_layers ?? '—'} MIMO · ${slice.allocated_bandwidth_mbps ?? '—'} Mbps` : 'Generating config…'} />
-          <PipelineStep step={3} title="Network Monitor" done={!!monitor?.monitored_by}
+          <PipelineStep step={3} title="Safety Validator" done={!!safety?.validated_by}
+            summary={safety ? `${safety.verdict as string} · ${(safety.checks as any[])?.filter(c => c.passed).length ?? 0}/4 checks passed` : 'Validating config…'} />
+          <PipelineStep step={4} title="Network Monitor" done={!!monitor?.monitored_by}
             summary={monitor ? `Cell #${monitoredCellId} · score ${healthScore}/100 · ${(monitor.violations as any[])?.length ?? 0} violation(s)` : 'Reading KPIs…'} />
-          <PipelineStep step={4} title="RAN Optimizer" done={!!optim?.optimized_by}
+          <PipelineStep step={5} title="RAN Optimizer" done={!!optim?.optimized_by}
             summary={optim ? `${optim.action as string} · ${optim.action_description as string}` : 'Optimizing…'} />
         </div>
       </div>
+
+      {/* ── Safety Check ── */}
+      {safety && (
+        <div className="card">
+          <div className="flex items-center gap-2 mb-3">
+            <Shield size={13} className="text-accent-cyan" />
+            <p className="section-title">Safety Validation</p>
+            <span
+              className="ml-auto badge text-[10px] font-semibold capitalize"
+              style={{
+                background: safety.verdict === 'approved' ? '#00E5A020'
+                          : safety.verdict === 'rejected' ? '#FF444420' : '#FFB80020',
+                color:      safety.verdict === 'approved' ? '#00E5A0'
+                          : safety.verdict === 'rejected' ? '#FF4444'   : '#FFB800',
+              }}
+            >
+              {(safety.verdict as string).replace('_', ' ')}
+            </span>
+          </div>
+
+          {/* Checks list */}
+          <div className="space-y-1.5 mb-3">
+            {(safety.checks as any[])?.map((check: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-[11px]">
+                {check.passed
+                  ? <CheckCircle size={12} className="text-status-healthy shrink-0" />
+                  : <XCircle    size={12} className="text-status-critical shrink-0" />
+                }
+                <span className="font-mono text-text-secondary capitalize">
+                  {(check.name as string).replace(/_/g, ' ')}
+                </span>
+                <span className="text-text-muted truncate">— {check.detail}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Warnings */}
+          {Array.isArray(safety.warnings) && (safety.warnings as string[]).length > 0 && (
+            <div className="space-y-1">
+              {(safety.warnings as string[]).map((w, i) => (
+                <div key={i} className="flex items-start gap-1.5 text-[11px] text-status-warning">
+                  <AlertTriangle size={11} className="shrink-0 mt-0.5" />
+                  <span>{w}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Rejection reason */}
+          {safety.rejection_reason && (
+            <div className="mt-2 flex items-start gap-1.5 text-[11px] text-status-critical
+                            bg-status-critical/10 border border-status-critical/30 rounded-lg p-2">
+              <XCircle size={11} className="shrink-0 mt-0.5" />
+              <span>{safety.rejection_reason as string}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── KPI Before → After ── */}
       {execBefore && execAfter && improvements && (

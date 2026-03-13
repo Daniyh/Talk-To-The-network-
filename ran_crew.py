@@ -2,10 +2,11 @@
 CrewAI multi-agent pipeline for 5.5G / 5G-Advanced RAN optimization.
 
 Pipeline (sequential):
-    Agent 1 – Intent Parser   : NL → structured intent JSON
-    Agent 2 – RAN Planner     : intent → 3GPP R18 config JSON
-    Agent 3 – Network Monitor : CSV tool → KPI health JSON
-    Agent 4 – RAN Optimizer   : all context → optimisation result JSON
+    Agent 1 – Intent Parser       : NL → structured intent JSON
+    Agent 2 – RAN Planner         : intent → 3GPP R18 config JSON
+    Agent 3 – Safety Validator    : config + intent → safety verdict JSON
+    Agent 4 – Network Monitor     : CSV tool → KPI health JSON
+    Agent 5 – RAN Optimizer       : all context → optimisation result JSON
 """
 
 import json
@@ -21,6 +22,7 @@ from fallbacks import (
     build_fallback_intent,
     build_fallback_monitor,
     build_fallback_optimization,
+    build_fallback_safety,
 )
 
 log = logging.getLogger(__name__)
@@ -247,6 +249,80 @@ MIMO: high-density eMBB → 8x8 Massive MIMO; URLLC → 4x4; mMTC → 2x2
     )
 
 
+def _build_safety_agent(llm):
+    return Agent(
+        role="RAN Configuration Safety Validator",
+        goal=(
+            "Validate the generated RAN configuration against hard network limits "
+            "and 3GPP feasibility constraints before it reaches the network."
+        ),
+        backstory=(
+            "You are a senior network safety engineer at a Tier-1 mobile operator. "
+            "You are the last line of defence before any configuration reaches live infrastructure. "
+            "You enforce hard limits on bandwidth, latency feasibility per slice type, cell capacity, "
+            "and QoS parameter consistency. You have blocked dozens of misconfigured deployments "
+            "that would have caused outages."
+        ),
+        llm=llm,
+        verbose=True,
+        allow_delegation=False,
+        max_iter=3,
+    )
+
+
+def _build_safety_task(agent, intent_task, planner_task):
+    return Task(
+        description="""
+Review the operator intent and the generated RAN configuration from the previous agents.
+Validate the configuration against the hard limits below. Return ONLY a single valid JSON object.
+
+Hard limits to check (perform ALL four checks):
+
+1. BANDWIDTH LIMIT
+   - allocated_bandwidth_mbps must be ≤ 1000 Mbps per slice
+   - If exceeded: check fails, verdict = rejected
+
+2. LATENCY FEASIBILITY
+   - URLLC slice: latency_target_ms must be ≤ 10 ms
+   - eMBB  slice: latency_target_ms must be ≤ 100 ms
+   - mMTC  slice: latency_target_ms must be ≤ 300 ms
+   - If exceeded: check fails, verdict = rejected
+
+3. CAPACITY CHECK
+   - Estimated capacity = active_cells × 1000 concurrent users per cell
+   - If expected_users > capacity: check fails, verdict = approved_with_warnings (not rejected)
+
+4. QOS CONSISTENCY
+   - eMBB  → 5QI should be in [7, 8, 9]
+   - URLLC → 5QI should be in [1, 2, 82, 83]
+   - mMTC  → 5QI should be in [70, 79]
+   - If mismatch: check fails, verdict = approved_with_warnings (not rejected)
+
+Verdict rules:
+  - All checks pass                        → "approved"
+  - Any bandwidth or latency check fails   → "rejected"
+  - Only capacity or QoS check fails       → "approved_with_warnings"
+
+Required JSON structure:
+{
+    "verdict": "<approved | approved_with_warnings | rejected>",
+    "checks": [
+        {"name": "bandwidth_limit",    "passed": <bool>, "detail": "<one sentence>"},
+        {"name": "latency_feasibility","passed": <bool>, "detail": "<one sentence>"},
+        {"name": "capacity_check",     "passed": <bool>, "detail": "<one sentence>"},
+        {"name": "qos_consistency",    "passed": <bool>, "detail": "<one sentence>"}
+    ],
+    "warnings": ["<warning string if any>"],
+    "rejection_reason": "<string if rejected, else null>",
+    "validated_by": "Config Safety Validator Agent (CrewAI + Groq Llama 3.3 70B)"
+}
+""",
+        agent=agent,
+        expected_output="A single valid JSON object with the safety validation verdict.",
+        context=[intent_task, planner_task],
+    )
+
+
 def _build_monitor_agent(llm, csv_tool):
     return Agent(
         role="Real-time RAN Health Monitor",
@@ -422,23 +498,25 @@ def run_pipeline(user_intent: str) -> dict:
     log.info("Inferred location_hint: '%s'", location_hint)
 
     # Build agents
-    intent_agent = _build_intent_agent(llm)
-    planner_agent = _build_planner_agent(llm)
-    monitor_agent = _build_monitor_agent(llm, csv_tool)
+    intent_agent    = _build_intent_agent(llm)
+    planner_agent   = _build_planner_agent(llm)
+    safety_agent    = _build_safety_agent(llm)
+    monitor_agent   = _build_monitor_agent(llm, csv_tool)
     optimizer_agent = _build_optimizer_agent(llm, csv_tool)
 
     # Build tasks
-    intent_task = _build_intent_task(intent_agent, user_intent)
-    planner_task = _build_planner_task(planner_agent, intent_task)
-    monitor_task = _build_monitor_task(monitor_agent, intent_task, location_hint)
+    intent_task    = _build_intent_task(intent_agent, user_intent)
+    planner_task   = _build_planner_task(planner_agent, intent_task)
+    safety_task    = _build_safety_task(safety_agent, intent_task, planner_task)
+    monitor_task   = _build_monitor_task(monitor_agent, intent_task, location_hint)
     optimizer_task = _build_optimizer_task(
         optimizer_agent, intent_task, planner_task, monitor_task
     )
 
-    # Assemble crew (sequential: intent → planner → monitor → optimizer)
+    # Assemble crew (sequential: intent → planner → safety → monitor → optimizer)
     crew = Crew(
-        agents=[intent_agent, planner_agent, monitor_agent, optimizer_agent],
-        tasks=[intent_task, planner_task, monitor_task, optimizer_task],
+        agents=[intent_agent, planner_agent, safety_agent, monitor_agent, optimizer_agent],
+        tasks=[intent_task, planner_task, safety_task, monitor_task, optimizer_task],
         process=Process.sequential,
         verbose=True,
     )
@@ -448,32 +526,37 @@ def run_pipeline(user_intent: str) -> dict:
 
     # --------------- Extract individual task outputs --------------------- #
     # CrewAI ≥ 0.70 exposes result.tasks_output (list of TaskOutput objects)
-    intent_data = config_data = monitor_data = optimizer_data = None
+    intent_data = config_data = safety_data = monitor_data = optimizer_data = None
 
     try:
         outputs = crew_result.tasks_output  # list[TaskOutput]
-        if outputs and len(outputs) >= 4:
-            intent_data = _extract_json(outputs[0].raw)
-            config_data = _extract_json(outputs[1].raw)
-            monitor_data = _extract_json(outputs[2].raw)
-            optimizer_data = _extract_json(outputs[3].raw)
+        if outputs and len(outputs) >= 5:
+            intent_data    = _extract_json(outputs[0].raw)
+            config_data    = _extract_json(outputs[1].raw)
+            safety_data    = _extract_json(outputs[2].raw)
+            monitor_data   = _extract_json(outputs[3].raw)
+            optimizer_data = _extract_json(outputs[4].raw)
     except AttributeError:
         pass
 
     # Fallback: try crew.tasks[i].output.raw (older CrewAI API)
     if not intent_data:
         try:
-            intent_data = _extract_json(_task_raw(crew.tasks[0]))
-            config_data = _extract_json(_task_raw(crew.tasks[1]))
-            monitor_data = _extract_json(_task_raw(crew.tasks[2]))
-            optimizer_data = _extract_json(_task_raw(crew.tasks[3]))
+            intent_data    = _extract_json(_task_raw(crew.tasks[0]))
+            config_data    = _extract_json(_task_raw(crew.tasks[1]))
+            safety_data    = _extract_json(_task_raw(crew.tasks[2]))
+            monitor_data   = _extract_json(_task_raw(crew.tasks[3]))
+            optimizer_data = _extract_json(_task_raw(crew.tasks[4]))
         except Exception as exc:
             log.warning("Could not read task outputs via crew.tasks: %s", exc)
 
     # Apply fallbacks for any missing piece
+    resolved_intent = intent_data or build_fallback_intent(user_intent)
+    resolved_config = config_data or build_fallback_config(resolved_intent)
     return {
-        "intent": intent_data or build_fallback_intent(user_intent),
-        "config": config_data or build_fallback_config(intent_data or {}),
-        "monitor": monitor_data or build_fallback_monitor(),
+        "intent":       resolved_intent,
+        "config":       resolved_config,
+        "safety":       safety_data or build_fallback_safety(resolved_config, resolved_intent),
+        "monitor":      monitor_data or build_fallback_monitor(),
         "optimization": optimizer_data or build_fallback_optimization(monitor_data or {}),
     }

@@ -71,6 +71,7 @@ export interface IntentResult {
   result: {
     intent?: Record<string, unknown>;
     config?: Record<string, unknown>;
+    safety?: Record<string, unknown>;
     monitor?: Record<string, unknown>;
     optimization?: Record<string, unknown>;
     raw_output?: string;
