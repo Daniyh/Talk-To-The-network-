@@ -25,6 +25,18 @@ export function IntentPanel() {
   const [history,  setHistory]  = useState<{ intent: string; result: IntentResult }[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // ── Restore from localStorage on first load ────────────────────────────────
+  // [LINE A] This runs once when the component mounts (empty [] dependency array).
+  // It checks if the browser has a previously saved result and history,
+  // and if so, puts them back into state — so the page looks exactly as the
+  // user left it, even after navigating away or refreshing.
+  useEffect(() => {
+    const savedResult  = localStorage.getItem('intent_result');
+    const savedHistory = localStorage.getItem('intent_history');
+    if (savedResult)  setResult(JSON.parse(savedResult));
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
+  }, []);
+
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -42,8 +54,16 @@ export function IntentPanel() {
     setResult(null);
     try {
       const res = await processIntent(t);
+      // [LINE B] Build the new history entry and prepend it (max 5 items kept).
+      const newHistory = [{ intent: t, result: res }, ...history.slice(0, 4)];
       setResult(res);
-      setHistory(h => [{ intent: t, result: res }, ...h.slice(0, 4)]);
+      setHistory(newHistory);
+      // [LINE C] Save the latest result and full history to localStorage.
+      // localStorage is a key-value store built into every browser.
+      // JSON.stringify converts the JavaScript object into a plain string
+      // so it can be stored — JSON.parse (in LINE A) converts it back.
+      localStorage.setItem('intent_result',  JSON.stringify(res));
+      localStorage.setItem('intent_history', JSON.stringify(newHistory));
     } catch (e: any) {
       setError(e.message ?? 'Failed to process intent');
     } finally {
