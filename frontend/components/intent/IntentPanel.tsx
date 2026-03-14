@@ -151,12 +151,12 @@ export function IntentPanel() {
             <div>
               <p className="text-sm font-medium text-text-primary">Processing intent…</p>
               <p className="text-xs text-text-secondary mt-0.5">
-                Running 4 AI agents: Intent → Planner → Monitor → Optimizer
+                Running 5 AI agents: Intent → Planner → Safety → Monitor → Optimizer
               </p>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-4 gap-2">
-            {['Intent Parser','Planner','Monitor','Optimizer'].map((a, i) => (
+          <div className="mt-3 grid grid-cols-5 gap-2">
+            {['Intent Parser','Planner','Safety','Monitor','Optimizer'].map((a, i) => (
               <div key={a} className="flex flex-col items-center gap-1.5">
                 <div className="w-8 h-8 rounded-full border border-accent-cyan/40
                                 flex items-center justify-center">
