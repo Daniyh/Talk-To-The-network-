@@ -65,7 +65,7 @@ def health():
     groq_key_set = bool(os.getenv("GROQ_API_KEY"))
     return jsonify({
         "status": "ok",
-        "service": "RAN Optimizer Backend (CrewAI)",
+        "service": "TalkNet Backend (CrewAI)",
         "groq_configured": groq_key_set,
         "model": "llama-3.3-70b-versatile",
         "agents": ["Intent Parser", "RAN Planner", "Safety Validator", "Network Monitor", "RAN Optimizer"]

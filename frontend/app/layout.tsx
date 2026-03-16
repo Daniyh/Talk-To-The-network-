@@ -1,10 +1,10 @@
 'use client';
 
 import './globals.css';
-import React, { createContext } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, MessageSquare, Database, Wifi } from 'lucide-react';
+import { Activity, MessageSquare, Database } from 'lucide-react';
 import { useDatasetProvider, DatasetContext } from '@/hooks/useDataset';
 
 // ── Nav items ────────────────────────────────────────────────────────────────
@@ -25,16 +25,20 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* ── Sidebar ── */}
         <aside className="w-60 shrink-0 flex flex-col border-r border-border bg-bg-secondary">
           {/* Logo */}
-          <div className="px-5 py-6 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-ericsson-blue flex items-center justify-center">
-                <Wifi size={16} className="text-accent-cyan" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary leading-tight">5G Advanced Network</p>
-                <p className="text-[10px] text-accent-cyan tracking-widest uppercase font-semibold">Talk to the Network</p>
-              </div>
-            </div>
+          <div className="px-5 py-5 border-b border-border">
+            <svg viewBox="0 0 220 52" width="148" height="35" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="2" width="48" height="48" rx="10" fill="#0D1F35"/>
+              <path d="M14 9 Q8 9 8 15 L8 32 Q8 38 14 38 L20 38 L16 44 L26 38 L34 38 Q40 38 40 32 L40 15 Q40 9 34 9 Z"
+                    fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinejoin="round"/>
+              <circle cx="24" cy="30" r="2.5" fill="#00D4FF"/>
+              <path d="M19 30 A5 5 0 0 0 29 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M15 30 A9 9 0 0 0 33 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+              <path d="M11 30 A13 13 0 0 0 37 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.3"/>
+              <text fontFamily="'Inter','Helvetica Neue',Arial,sans-serif" fontSize="28" fontWeight="700" letterSpacing="-0.5" y="37" x="60">
+                <tspan fill="#E8F4FF">Talk</tspan><tspan fill="#00D4FF">Net</tspan>
+              </text>
+            </svg>
+            <p className="text-[10px] text-text-muted tracking-widest uppercase mt-1">5G-Advanced · Intent AI</p>
           </div>
 
           {/* Live indicator */}
@@ -94,8 +98,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Talk to the Network — 5G Advanced AI Optimizer</title>
-        <meta name="description" content="Talk to the Network — Intent-Based 5G-Advanced Network Optimizer" />
+        <title>TalkNet — 5G Advanced AI Optimizer</title>
+        <meta name="description" content="TalkNet — Talk to your network in plain language. Intent-Based 5G-Advanced RAN Optimizer." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
