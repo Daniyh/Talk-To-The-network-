@@ -38,7 +38,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
                 <tspan fill="#E8F4FF">Talk</tspan><tspan fill="#00D4FF">Net</tspan>
               </text>
             </svg>
-            <p className="text-[10px] text-accent-cyan tracking-widest uppercase mt-1">Talk To the Network</p>
+            <p className="text-[10px] text-text-secondary tracking-widest uppercase mt-1">Talk To the Network</p>
           </div>
 
           {/* Live indicator */}
