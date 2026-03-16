@@ -64,6 +64,19 @@ export interface RawRow {
   [key: string]: string;
 }
 
+// ─── Clarification Types ─────────────────────────────────────────────────────
+
+export interface ClarificationResult {
+  success: boolean;
+  result: {
+    needs_clarification: boolean;
+    questions: string[];
+    confidence: number;
+    missing_params: string[];
+    analyzed_by?: string;
+  };
+}
+
 // ─── Intent Types ────────────────────────────────────────────────────────────
 
 export interface IntentResult {

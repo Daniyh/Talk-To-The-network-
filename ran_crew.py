@@ -18,6 +18,7 @@ from crewai import Agent, Task
 
 from csv_tool import NetworkDataReaderTool
 from fallbacks import (
+    build_fallback_clarify,
     build_fallback_config,
     build_fallback_intent,
     build_fallback_monitor,
@@ -115,6 +116,60 @@ def _task_raw(task) -> str:
 # ---------------------------------------------------------------------------
 # Agent & Task builders
 # ---------------------------------------------------------------------------
+
+def _build_clarifier_agent(llm) -> "Agent":
+    return Agent(
+        role="Intent Clarification Specialist",
+        goal=(
+            "Determine if the operator's network intent contains enough information "
+            "to generate a precise configuration. Ask at most 2 targeted questions "
+            "if critical parameters are missing. Never ask for things already stated."
+        ),
+        backstory=(
+            "You are a senior telecom consultant who reviews network automation requests "
+            "before they reach the engineering pipeline. You know exactly which parameters "
+            "matter — time, duration, scale, and location. If an intent is clear enough "
+            "you approve it immediately. You never over-question; you only ask when a "
+            "missing parameter would meaningfully change the configuration."
+        ),
+        llm=llm,
+        verbose=False,
+        allow_delegation=False,
+        max_iter=2,
+    )
+
+
+def _build_clarifier_task(agent, user_intent: str):
+    return Task(
+        description=f"""
+Analyse the following operator intent and decide if clarification is needed
+before the network configuration pipeline runs.
+
+    INTENT: "{user_intent}"
+
+Rules:
+1. If intent type is emergency / ambulance / hospital / fire → ALWAYS set needs_clarification=false
+   (speed is critical, do not delay emergencies)
+2. Check for missing CRITICAL parameters only:
+   - TIME: vague words like "tonight", "later", "soon" without a specific hour
+   - SCALE: crowd/event intent without a user count (no digits at all)
+   - LOCATION: no specific zone mentioned (hospital / stadium / factory / downtown / residential)
+3. Ask at most 2 questions. If intent is already specific enough, set needs_clarification=false.
+4. Confidence ≥ 0.85 → no clarification needed.
+
+Return ONLY a single valid JSON object:
+{{
+    "needs_clarification": <true | false>,
+    "questions": ["<question 1>", "<question 2>"],
+    "confidence": <float 0.0–1.0>,
+    "missing_params": ["<param name>", ...],
+    "analyzed_by": "Intent Clarifier Agent (CrewAI + Groq Llama 3.3 70B)"
+}}
+""",
+        agent=agent,
+        expected_output="A single valid JSON object with the clarification decision.",
+    )
+
 
 def _build_intent_agent(llm) -> "Agent":
     return Agent(
@@ -482,6 +537,32 @@ Required JSON structure:
 # ---------------------------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------------------------
+
+def run_clarifier(user_intent: str) -> dict:
+    """
+    Run only the single Clarifier agent.
+    Returns clarification JSON — fast, does not run the full pipeline.
+    """
+    from crewai import Crew, Process  # lazy import
+
+    llm = _get_llm()
+    agent = _build_clarifier_agent(llm)
+    task  = _build_clarifier_task(agent, user_intent)
+
+    crew = Crew(agents=[agent], tasks=[task], process=Process.sequential, verbose=False)
+    result = crew.kickoff()
+
+    try:
+        outputs = result.tasks_output
+        if outputs:
+            data = _extract_json(outputs[0].raw)
+            if data and "needs_clarification" in data:
+                return data
+    except Exception:
+        pass
+
+    return build_fallback_clarify(user_intent)
+
 
 def run_pipeline(user_intent: str) -> dict:
     """

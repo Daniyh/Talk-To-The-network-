@@ -15,6 +15,10 @@ const nextConfig = {
         source: '/api/intent',
         destination: `${backendUrl}/api/intent`,
       },
+      {
+        source: '/api/clarify',
+        destination: `${backendUrl}/api/clarify`,
+      },
     ];
   },
 };

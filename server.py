@@ -73,6 +73,32 @@ def health():
 
 
 # ---------------------------------------------------------------------------
+# Clarification endpoint  (fast — single agent, no full pipeline)
+# ---------------------------------------------------------------------------
+
+@app.route("/api/clarify", methods=["POST"])
+def handle_clarify():
+    data = request.get_json(silent=True)
+    if not data or "intent" not in data:
+        return jsonify({"success": False, "error": "Missing 'intent' field"}), 400
+
+    user_intent = str(data["intent"]).strip()
+    if not user_intent:
+        return jsonify({"success": False, "error": "Intent cannot be empty"}), 400
+
+    log.info("Clarify request: %s", user_intent[:120])
+
+    try:
+        from ran_crew import run_clarifier
+        result = run_clarifier(user_intent)
+        return jsonify({"success": True, "result": result})
+    except Exception as exc:
+        log.warning("Clarifier error (%s) — using fallback", exc)
+        from fallbacks import build_fallback_clarify
+        return jsonify({"success": True, "result": build_fallback_clarify(user_intent)})
+
+
+# ---------------------------------------------------------------------------
 # Main intent endpoint
 # ---------------------------------------------------------------------------
 

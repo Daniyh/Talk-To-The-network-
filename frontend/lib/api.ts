@@ -1,4 +1,4 @@
-import type { IntentResult } from './types';
+import type { IntentResult, ClarificationResult } from './types';
 
 /**
  * In development  → Next.js rewrites /api/intent → http://localhost:8000/api/intent
@@ -11,6 +11,18 @@ function intentUrl(): string {
   if (pub) return `${pub}/api/intent`;
   // Default: go through Next.js rewrite proxy (works in both dev & prod)
   return '/api/intent';
+}
+
+export async function checkClarification(intent: string): Promise<ClarificationResult> {
+  const pub = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const url = pub ? `${pub}/api/clarify` : '/api/clarify';
+  const res = await fetch(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ intent }),
+  });
+  if (!res.ok) throw new Error('Clarification API error');
+  return res.json();
 }
 
 export async function processIntent(intent: string): Promise<IntentResult> {

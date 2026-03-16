@@ -324,6 +324,58 @@ def build_fallback_safety(config: dict, intent: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Clarification fallback
+# ---------------------------------------------------------------------------
+
+def build_fallback_clarify(user_intent: str) -> dict:
+    """Rule-based clarification check used when the LLM Clarifier agent fails."""
+    t = user_intent.lower()
+    questions = []
+    missing = []
+
+    # Emergency intents — never delay, proceed immediately
+    emergency_words = ["emergency", "ambulance", "hospital", "fire", "police", "critical"]
+    if any(w in t for w in emergency_words):
+        return {
+            "needs_clarification": False,
+            "questions": [],
+            "confidence": 0.95,
+            "missing_params": [],
+            "analyzed_by": "Rule-based Fallback Clarifier",
+        }
+
+    # Time ambiguity — vague time without a specific hour
+    vague_time = ["tonight", "today", "tomorrow", "this evening", "later", "soon", "this weekend"]
+    has_specific_time = any(c.isdigit() for c in user_intent) and (
+        ":" in user_intent or "pm" in t or "am" in t or "hour" in t
+    )
+    if any(w in t for w in vague_time) and not has_specific_time:
+        questions.append("What time does the event start, and how long will it last?")
+        missing.append("time")
+
+    # Scale ambiguity for crowd events
+    crowd_words = ["stadium", "concert", "festival", "fans", "crowd", "match", "game", "event"]
+    if any(w in t for w in crowd_words) and not any(c.isdigit() for c in user_intent):
+        questions.append("How many users or attendees are expected?")
+        missing.append("expected_users")
+
+    # Location vagueness (only if we still have room for a question)
+    specific_locations = ["hospital", "stadium", "factory", "downtown", "residential", "campus", "airport"]
+    if not any(loc in t for loc in specific_locations) and len(questions) < 2:
+        questions.append("Which specific location or zone should this apply to?")
+        missing.append("location")
+
+    questions = questions[:2]
+    return {
+        "needs_clarification": len(questions) > 0,
+        "questions": questions,
+        "confidence": 0.6 if questions else 0.9,
+        "missing_params": missing,
+        "analyzed_by": "Rule-based Fallback Clarifier",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Combined helper
 # ---------------------------------------------------------------------------
 

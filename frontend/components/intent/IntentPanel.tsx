@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, AlertCircle } from 'lucide-react';
-import { processIntent } from '@/lib/api';
+import { processIntent, checkClarification } from '@/lib/api';
 import type { IntentResult } from '@/lib/types';
 import { IntentResultCard } from './IntentResultCard';
 
@@ -17,13 +17,20 @@ const SAMPLES = [
 
 
 // ── Main component ────────────────────────────────────────────────────────────
+type Phase = 'idle' | 'clarifying' | 'awaiting' | 'processing';
+
 export function IntentPanel() {
-  const [input,    setInput]    = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
-  const [result,   setResult]   = useState<IntentResult | null>(null);
-  const [history,  setHistory]  = useState<{ intent: string; result: IntentResult }[]>([]);
+  const [input,     setInput]     = useState('');
+  const [phase,     setPhase]     = useState<Phase>('idle');
+  const [error,     setError]     = useState<string | null>(null);
+  const [result,    setResult]    = useState<IntentResult | null>(null);
+  const [history,   setHistory]   = useState<{ intent: string; result: IntentResult }[]>([]);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [answers,   setAnswers]   = useState<string[]>([]);
+  const [pendingIntent, setPendingIntent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const loading = phase === 'clarifying' || phase === 'processing';
 
   // ── Restore from localStorage on first load ────────────────────────────────
   // [LINE A] This runs once when the component mounts (empty [] dependency array).
@@ -45,30 +52,56 @@ export function IntentPanel() {
     }
   }, [input]);
 
-  const submit = async (text: string) => {
-    const t = text.trim();
-    if (!t || loading) return;
-    setInput('');
-    setLoading(true);
+  const runPipeline = async (enrichedIntent: string, originalIntent: string) => {
+    setPhase('processing');
     setError(null);
-    setResult(null);
     try {
-      const res = await processIntent(t);
-      // [LINE B] Build the new history entry and prepend it (max 5 items kept).
-      const newHistory = [{ intent: t, result: res }, ...history.slice(0, 4)];
+      const res = await processIntent(enrichedIntent);
+      const newHistory = [{ intent: originalIntent, result: res }, ...history.slice(0, 4)];
       setResult(res);
       setHistory(newHistory);
-      // [LINE C] Save the latest result and full history to localStorage.
-      // localStorage is a key-value store built into every browser.
-      // JSON.stringify converts the JavaScript object into a plain string
-      // so it can be stored — JSON.parse (in LINE A) converts it back.
       localStorage.setItem('intent_result',  JSON.stringify(res));
       localStorage.setItem('intent_history', JSON.stringify(newHistory));
     } catch (e: any) {
       setError(e.message ?? 'Failed to process intent');
     } finally {
-      setLoading(false);
+      setPhase('idle');
     }
+  };
+
+  const submit = async (text: string) => {
+    const t = text.trim();
+    if (!t || loading) return;
+    setInput('');
+    setResult(null);
+    setError(null);
+    setPhase('clarifying');
+    setPendingIntent(t);
+    try {
+      const clarify = await checkClarification(t);
+      const r = clarify.result;
+      if (r.needs_clarification && r.questions.length > 0) {
+        setQuestions(r.questions);
+        setAnswers(new Array(r.questions.length).fill(''));
+        setPhase('awaiting');
+      } else {
+        await runPipeline(t, t);
+      }
+    } catch {
+      // If clarify endpoint fails, proceed directly
+      await runPipeline(t, t);
+    }
+  };
+
+  const submitWithAnswers = async () => {
+    const filled = answers.every(a => a.trim());
+    if (!filled) return;
+    const context = questions.map((q, i) => `${q}: ${answers[i]}`).join('. ');
+    const enriched = `${pendingIntent}. Additional context: ${context}`;
+    setPhase('processing');
+    setQuestions([]);
+    setAnswers([]);
+    await runPipeline(enriched, pendingIntent);
   };
 
   return (
@@ -143,8 +176,69 @@ export function IntentPanel() {
         </div>
       </div>
 
-      {/* Loading state */}
-      {loading && (
+      {/* Clarifying state */}
+      {phase === 'clarifying' && (
+        <div className="card-glow shrink-0 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <Loader2 size={16} className="text-accent-cyan animate-spin" />
+            <div>
+              <p className="text-sm font-medium text-text-primary">Analyzing intent…</p>
+              <p className="text-xs text-text-secondary mt-0.5">Checking if more information is needed</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clarification questions */}
+      {phase === 'awaiting' && questions.length > 0 && (
+        <div className="card-glow shrink-0 animate-fade-in space-y-4">
+          <div className="flex items-center gap-2">
+            <Bot size={15} className="text-accent-cyan" />
+            <p className="text-sm font-semibold text-text-primary">A few quick questions</p>
+          </div>
+          <p className="text-xs text-text-secondary">
+            Your intent needs a bit more detail to generate a precise configuration.
+          </p>
+          {questions.map((q, i) => (
+            <div key={i} className="space-y-1.5">
+              <p className="text-xs font-medium text-text-primary">{q}</p>
+              <input
+                type="text"
+                value={answers[i]}
+                onChange={e => {
+                  const updated = [...answers];
+                  updated[i] = e.target.value;
+                  setAnswers(updated);
+                }}
+                onKeyDown={e => { if (e.key === 'Enter') submitWithAnswers(); }}
+                placeholder="Your answer…"
+                className="w-full bg-bg-primary border border-border rounded-lg px-3 py-2
+                           text-sm text-text-primary placeholder-text-muted
+                           focus:outline-none focus:border-accent-cyan transition-colors"
+              />
+            </div>
+          ))}
+          <div className="flex gap-2">
+            <button
+              onClick={submitWithAnswers}
+              disabled={!answers.every(a => a.trim())}
+              className="btn-primary px-4 py-2 text-sm flex items-center gap-2 disabled:opacity-40"
+            >
+              <Send size={13} /> Proceed
+            </button>
+            <button
+              onClick={() => runPipeline(pendingIntent, pendingIntent)}
+              className="px-4 py-2 text-xs text-text-secondary border border-border rounded-lg
+                         hover:border-accent-cyan/50 transition-colors"
+            >
+              Skip & proceed anyway
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Processing state */}
+      {phase === 'processing' && (
         <div className="card-glow shrink-0 animate-fade-in">
           <div className="flex items-center gap-3">
             <Loader2 size={16} className="text-accent-cyan animate-spin" />
