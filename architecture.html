@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TalkNet — System Architecture</title>
+  <style>
+    body { background: #060F1E; display: flex; flex-direction: column;
+           align-items: center; justify-content: center; min-height: 100vh;
+           margin: 0; font-family: sans-serif; gap: 20px; padding: 20px; }
+    button { background: #00D4FF; color: #0A1628; border: none; padding: 10px 28px;
+             border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    button:hover { background: #00b8e0; }
+  </style>
+</head>
+<body>
+
+<svg id="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 645" width="1000" height="645">
+
+  <!-- Background -->
+  <rect width="1000" height="645" fill="#0A1628" rx="12"/>
+
+  <!-- ══ TITLE ══ -->
+  <text x="500" y="26" text-anchor="middle" font-family="Inter,Helvetica Neue,Arial,sans-serif"
+        font-size="15" font-weight="700" fill="#E8F4FF" letter-spacing="0.5">
+    TalkNet — System Architecture
+  </text>
+
+  <!-- ══ USER BOX ══ -->
+  <rect x="385" y="38" width="230" height="54" rx="8" fill="#0D1F35" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="500" y="61" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#E8F4FF">User / Browser</text>
+  <text x="500" y="79" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Natural Language Intent Input</text>
+
+  <!-- arrow down to frontend -->
+  <line x1="500" y1="92" x2="500" y2="112" stroke="#334D6E" stroke-width="2"/>
+  <polygon points="500,114 494,105 506,105" fill="#334D6E"/>
+
+  <!-- ══ FRONTEND LAYER ══ -->
+  <rect x="22" y="114" width="956" height="122" rx="10" fill="#0D1F35" stroke="#334D6E" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="35" y="131" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1.5">FRONTEND · NEXT.JS · VERCEL</text>
+
+  <!-- Network Monitor sub-box -->
+  <rect x="48" y="140" width="198" height="82" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <text x="147" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Network Monitor</text>
+  <text x="147" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Live KPI Cards · Cell Topology</text>
+  <text x="147" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Area Chart · 30-tick history</text>
+  <text x="147" y="207" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Polls every 5s from CSV</text>
+
+  <!-- Intent AI sub-box -->
+  <rect x="401" y="140" width="198" height="82" rx="7" fill="#0A1628" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="500" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Intent AI</text>
+  <text x="500" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL Input · 5-Agent Result Card</text>
+  <text x="500" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Pipeline steps · Safety badge</text>
+  <text x="500" y="207" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">localStorage persistence</text>
+
+  <!-- Dataset sub-box -->
+  <rect x="754" y="140" width="198" height="82" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <text x="853" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Dataset</text>
+  <text x="853" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">CSV Upload / Default</text>
+  <text x="853" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">6G HetNet · 50 cells</text>
+  <text x="853" y="207" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">5 location zones</text>
+
+  <!-- arrow: Intent AI → Backend -->
+  <line x1="500" y1="236" x2="500" y2="260" stroke="#00D4FF" stroke-width="1.5"/>
+  <polygon points="500,262 494,253 506,253" fill="#00D4FF"/>
+  <rect x="510" y="244" width="108" height="14" rx="3" fill="#0A1628"/>
+  <text x="564" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">POST /api/intent</text>
+
+  <!-- JSON result arrow back (left side) -->
+  <path d="M270 297 L210 297 L210 181 L248 181" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="250,181 242,176 242,186" fill="#00E5A0"/>
+  <rect x="168" y="228" width="68" height="14" rx="3" fill="#0A1628"/>
+  <text x="202" y="238" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">JSON result</text>
+
+  <!-- ══ BACKEND BOX ══ -->
+  <rect x="270" y="262" width="460" height="68" rx="8" fill="#0D1F35" stroke="#FFB800" stroke-width="1.5"/>
+  <text x="500" y="288" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#E8F4FF">Flask Backend</text>
+  <text x="500" y="305" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Railway · Python · /api/intent  /health · CORS</text>
+  <text x="500" y="320" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#FFB800">Rule-based fallback if Groq API unavailable</text>
+
+  <!-- arrow down to pipeline -->
+  <line x1="500" y1="330" x2="500" y2="353" stroke="#334D6E" stroke-width="2"/>
+  <polygon points="500,355 494,346 506,346" fill="#334D6E"/>
+
+  <!-- ══ PIPELINE LAYER ══ -->
+  <rect x="22" y="355" width="956" height="148" rx="10" fill="#0D1F35" stroke="#334D6E" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="35" y="373" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1.5">CREWAI PIPELINE · GROQ LLAMA 3.3 70B · SEQUENTIAL</text>
+
+  <!-- Agent 1: Intent Parser -->
+  <rect x="38" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#00D4FF" stroke-width="1.5"/>
+  <rect x="38" y="382" width="170" height="22" rx="7" fill="#00D4FF" fill-opacity="0.12"/>
+  <text x="123" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00D4FF" letter-spacing="0.5">① INTENT PARSER</text>
+  <text x="123" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Intent Parser</text>
+  <text x="123" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL → structured JSON</text>
+  <text x="123" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">slice · priority · users</text>
+  <text x="123" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency · bandwidth</text>
+  <text x="123" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location hint</text>
+
+  <!-- arrow 1→2 -->
+  <line x1="208" y1="435" x2="222" y2="435" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="224,435 216,430 216,440" fill="#334D6E"/>
+
+  <!-- Agent 2: RAN Planner -->
+  <rect x="224" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <rect x="224" y="382" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
+  <text x="309" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">② RAN PLANNER</text>
+  <text x="309" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Planner</text>
+  <text x="309" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">3GPP R18 config</text>
+  <text x="309" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">MIMO · slicing · 5QI</text>
+  <text x="309" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">scheduler · numerology</text>
+  <text x="309" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">carrier aggregation</text>
+
+  <!-- arrow 2→3 -->
+  <line x1="394" y1="435" x2="408" y2="435" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="410,435 402,430 402,440" fill="#334D6E"/>
+
+  <!-- Agent 3: Safety Validator -->
+  <rect x="410" y="382" width="180" height="106" rx="7" fill="#0A1628" stroke="#FFB800" stroke-width="1.5"/>
+  <rect x="410" y="382" width="180" height="22" rx="7" fill="#FFB800" fill-opacity="0.12"/>
+  <text x="500" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#FFB800" letter-spacing="0.5">③ SAFETY VALIDATOR</text>
+  <text x="500" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Safety Validator</text>
+  <text x="500" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">bandwidth ≤ 1000 Mbps</text>
+  <text x="500" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency feasibility</text>
+  <text x="500" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">capacity check</text>
+  <text x="500" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">QoS consistency</text>
+
+  <!-- arrow 3→4 -->
+  <line x1="590" y1="435" x2="604" y2="435" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="606,435 598,430 598,440" fill="#334D6E"/>
+
+  <!-- Agent 4: Network Monitor -->
+  <rect x="606" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <rect x="606" y="382" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
+  <text x="691" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">④ NETWORK MONITOR</text>
+  <text x="691" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Network Monitor</text>
+  <text x="691" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">reads CSV dataset</text>
+  <text x="691" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">KPI health score</text>
+  <text x="691" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">violation detection</text>
+  <text x="691" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location filtering</text>
+
+  <!-- arrow 4→5 -->
+  <line x1="776" y1="435" x2="790" y2="435" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="792,435 784,430 784,440" fill="#334D6E"/>
+
+  <!-- Agent 5: RAN Optimizer -->
+  <rect x="792" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#00E5A0" stroke-width="1.5"/>
+  <rect x="792" y="382" width="170" height="22" rx="7" fill="#00E5A0" fill-opacity="0.12"/>
+  <text x="877" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00E5A0" letter-spacing="0.5">⑤ RAN OPTIMIZER</text>
+  <text x="877" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Optimizer</text>
+  <text x="877" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">action selection</text>
+  <text x="877" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">before/after KPIs</text>
+  <text x="877" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">improvement %</text>
+  <text x="877" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">SON strategies</text>
+
+  <!-- ══ EXTERNAL SERVICES ══ -->
+
+  <!-- Groq API -->
+  <rect x="68" y="548" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="183" y="572" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Groq API</text>
+  <text x="183" y="589" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Llama 3.3 70B Versatile</text>
+  <text x="183" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference · All 5 agents</text>
+
+  <!-- CSV Dataset -->
+  <rect x="702" y="548" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00E5A0" stroke-width="1.5"/>
+  <text x="817" y="572" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">6G HetNet Dataset</text>
+  <text x="817" y="589" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">CSV · 50 cells · 5 zones</text>
+  <text x="817" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Agents 4 &amp; 5 · Frontend polling</text>
+
+  <!-- Arrow: Pipeline → Groq (dashed, from agent 1 bottom) -->
+  <path d="M123 488 L123 518 L183 518 L183 548" stroke="#00D4FF" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="183,550 177,541 189,541" fill="#00D4FF"/>
+  <rect x="88" y="508" width="60" height="14" rx="3" fill="#0A1628"/>
+  <text x="118" y="518" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">LLM calls</text>
+
+  <!-- Arrow: Agent 4 → CSV (dashed) -->
+  <path d="M691 488 L691 518 L817 518 L817 548" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="817,550 811,541 823,541" fill="#00E5A0"/>
+  <rect x="726" y="508" width="60" height="14" rx="3" fill="#0A1628"/>
+  <text x="756" y="518" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">CSV reads</text>
+
+  <!-- ══ LEGEND ══ -->
+  <rect x="330" y="548" width="340" height="72" rx="8" fill="#0D1F35" stroke="#334D6E" stroke-width="1"/>
+  <text x="500" y="567" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1">LEGEND</text>
+  <line x1="348" y1="580" x2="368" y2="580" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="372" y="584" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">REST API call</text>
+  <line x1="348" y1="596" x2="368" y2="596" stroke="#00E5A0" stroke-width="1.5"/>
+  <text x="372" y="600" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Response / data read</text>
+  <line x1="438" y1="580" x2="458" y2="580" stroke="#00D4FF" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="462" y="584" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference</text>
+  <line x1="438" y1="596" x2="458" y2="596" stroke="#00E5A0" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="462" y="600" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">CSV data read</text>
+  <rect x="528" y="573" width="10" height="10" rx="2" fill="#FFB800" fill-opacity="0.3" stroke="#FFB800" stroke-width="1"/>
+  <text x="542" y="582" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Safety gate</text>
+  <rect x="528" y="589" width="10" height="10" rx="2" fill="#00E5A0" fill-opacity="0.3" stroke="#00E5A0" stroke-width="1"/>
+  <text x="542" y="598" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Output / result</text>
+
+</svg>
+
+<button onclick="downloadDiagram()">Download PNG</button>
+
+<script>
+  function downloadDiagram() {
+    const svg = document.getElementById('diagram');
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000; canvas.height = 645;
+    const ctx = canvas.getContext('2d');
+    const data = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.download = 'talknet-architecture.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = url;
+  }
+</script>
+</body>
+</html>

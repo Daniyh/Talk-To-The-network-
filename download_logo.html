@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TalkNet Logo Download</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A1628; display: flex; flex-direction: column;
+           align-items: center; justify-content: center; min-height: 100vh;
+           font-family: 'Segoe UI', sans-serif; gap: 40px; padding: 40px; }
+    h1 { color: #E8F4FF; font-size: 18px; letter-spacing: 1px; }
+    .row { display: flex; gap: 40px; align-items: stretch; flex-wrap: wrap; justify-content: center; }
+    .card { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .label { font-size: 11px; font-weight: 700; letter-spacing: 2px;
+             text-transform: uppercase; color: #7B9DB5; }
+    .preview-dark  { background: #0A1628; padding: 36px 48px; border-radius: 12px;
+                     border: 1px solid #1A3050; }
+    .preview-light { background: #ffffff; padding: 36px 48px; border-radius: 12px;
+                     border: 1px solid #dde8f0; }
+    .btns { display: flex; gap: 10px; }
+    button { border: none; padding: 9px 22px; border-radius: 7px;
+             font-size: 12px; font-weight: 700; cursor: pointer; }
+    .btn-png  { background: #00D4FF; color: #0A1628; }
+    .btn-svg  { background: transparent; color: #00D4FF; border: 1px solid #00D4FF; }
+    .btn-png:hover  { background: #00b8e0; }
+    .btn-svg:hover  { background: #00D4FF22; }
+  </style>
+</head>
+<body>
+
+  <h1>TalkNet — Logo Downloads</h1>
+
+  <div class="row">
+
+    <!-- DARK VERSION -->
+    <div class="card">
+      <div class="label">Dark Background</div>
+      <div class="preview-dark">
+        <canvas id="dark" width="660" height="156"></canvas>
+      </div>
+      <div class="btns">
+        <button class="btn-png" onclick="downloadPNG('dark','talknet-logo-dark.png')">Download PNG</button>
+        <button class="btn-svg" onclick="downloadSVG('dark')">Download SVG</button>
+      </div>
+    </div>
+
+    <!-- LIGHT VERSION -->
+    <div class="card">
+      <div class="label">Light Background</div>
+      <div class="preview-light">
+        <canvas id="light" width="660" height="156"></canvas>
+      </div>
+      <div class="btns">
+        <button class="btn-png" onclick="downloadPNG('light','talknet-logo-light.png')">Download PNG</button>
+        <button class="btn-svg" onclick="downloadSVG('light')">Download SVG</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const svgs = {
+      dark: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 156" width="660" height="156">
+        <rect x="0" y="6" width="144" height="144" rx="30" fill="#0D1F35"/>
+        <path d="M42 27 Q24 27 24 45 L24 96 Q24 114 42 114 L60 114 L48 132 L78 114 L102 114 Q120 114 120 96 L120 45 Q120 27 102 27 Z"
+              fill="none" stroke="#00D4FF" stroke-width="6" stroke-linejoin="round"/>
+        <circle cx="72" cy="90" r="7.5" fill="#00D4FF"/>
+        <path d="M57 90 A15 15 0 0 0 87 90" fill="none" stroke="#00D4FF" stroke-width="6" stroke-linecap="round"/>
+        <path d="M45 90 A27 27 0 0 0 99 90" fill="none" stroke="#00D4FF" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+        <path d="M33 90 A39 39 0 0 0 111 90" fill="none" stroke="#00D4FF" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+        <text font-family="Inter,Helvetica Neue,Arial,sans-serif" font-size="84" font-weight="700" letter-spacing="-2" y="111" x="160">
+          <tspan fill="#E8F4FF">Talk</tspan><tspan fill="#00D4FF">Net</tspan>
+        </text>
+      </svg>`,
+
+      light: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 156" width="660" height="156">
+        <rect x="0" y="6" width="144" height="144" rx="30" fill="#E6F2FA"/>
+        <path d="M42 27 Q24 27 24 45 L24 96 Q24 114 42 114 L60 114 L48 132 L78 114 L102 114 Q120 114 120 96 L120 45 Q120 27 102 27 Z"
+              fill="none" stroke="#0099C8" stroke-width="6" stroke-linejoin="round"/>
+        <circle cx="72" cy="90" r="7.5" fill="#0099C8"/>
+        <path d="M57 90 A15 15 0 0 0 87 90" fill="none" stroke="#0099C8" stroke-width="6" stroke-linecap="round"/>
+        <path d="M45 90 A27 27 0 0 0 99 90" fill="none" stroke="#0099C8" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+        <path d="M33 90 A39 39 0 0 0 111 90" fill="none" stroke="#0099C8" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
+        <text font-family="Inter,Helvetica Neue,Arial,sans-serif" font-size="84" font-weight="700" letter-spacing="-2" y="111" x="160">
+          <tspan fill="#0D1F35">Talk</tspan><tspan fill="#0099C8">Net</tspan>
+        </text>
+      </svg>`
+    };
+
+    function renderToCanvas(id) {
+      const canvas = document.getElementById(id);
+      const ctx = canvas.getContext('2d');
+      if (id === 'light') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      const blob = new Blob([svgs[id]], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url); };
+      img.src = url;
+    }
+
+    function downloadPNG(id, filename) {
+      const canvas = document.getElementById(id);
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    }
+
+    function downloadSVG(id) {
+      const filename = id === 'dark' ? 'talknet-logo-dark.svg' : 'talknet-logo-light.svg';
+      const blob = new Blob([svgs[id]], { type: 'image/svg+xml;charset=utf-8' });
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = URL.createObjectURL(blob);
+      a.click();
+    }
+
+    renderToCanvas('dark');
+    renderToCanvas('light');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" width="220" height="52">
+  <!-- Icon background — light blue-gray -->
+  <rect x="0" y="2" width="48" height="48" rx="10" fill="#E6F2FA"/>
+
+  <!-- Speech bubble body + tail -->
+  <path d="M14 9 Q8 9 8 15 L8 32 Q8 38 14 38 L20 38 L16 44 L26 38 L34 38 Q40 38 40 32 L40 15 Q40 9 34 9 Z"
+        fill="none" stroke="#0099C8" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- WiFi dot -->
+  <circle cx="24" cy="30" r="2.5" fill="#0099C8"/>
+
+  <!-- WiFi arc — small -->
+  <path d="M19 30 A5 5 0 0 0 29 30"
+        fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- WiFi arc — medium -->
+  <path d="M15 30 A9 9 0 0 0 33 30"
+        fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- WiFi arc — large -->
+  <path d="M11 30 A13 13 0 0 0 37 30"
+        fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Wordmark: Talk dark, Net cyan -->
+  <text font-family="'Inter', 'Helvetica Neue', Arial, sans-serif"
+        font-size="28" font-weight="700" letter-spacing="-0.5" y="37" x="60">
+    <tspan fill="#0D1F35">Talk</tspan><tspan fill="#0099C8">Net</tspan>
+  </text>
+</svg>
