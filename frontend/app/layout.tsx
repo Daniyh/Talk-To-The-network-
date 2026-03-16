@@ -30,10 +30,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
               <rect x="0" y="2" width="48" height="48" rx="10" fill="#0D1F35"/>
               <path d="M14 9 Q8 9 8 15 L8 32 Q8 38 14 38 L20 38 L16 44 L26 38 L34 38 Q40 38 40 32 L40 15 Q40 9 34 9 Z"
                     fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinejoin="round"/>
-              <circle cx="24" cy="30" r="2.5" fill="#00D4FF"/>
-              <path d="M19 30 A5 5 0 0 0 29 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M15 30 A9 9 0 0 0 33 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
-              <path d="M11 30 A13 13 0 0 0 37 30" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.3"/>
+              <circle cx="24" cy="33" r="2.5" fill="#00D4FF"/>
+              <path d="M19 27 A5 5 0 0 1 29 27" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M15 27 A9 9 0 0 1 33 27" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+              <path d="M11 27 A13 13 0 0 1 37 27" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round" opacity="0.3"/>
               <text fontFamily="'Inter','Helvetica Neue',Arial,sans-serif" fontSize="28" fontWeight="700" letterSpacing="-0.5" y="37" x="60">
                 <tspan fill="#E8F4FF">Talk</tspan><tspan fill="#00D4FF">Net</tspan>
               </text>

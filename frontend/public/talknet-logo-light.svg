@@ -7,18 +7,18 @@
         fill="none" stroke="#0099C8" stroke-width="2" stroke-linejoin="round"/>
 
   <!-- WiFi dot -->
-  <circle cx="24" cy="30" r="2.5" fill="#0099C8"/>
+  <circle cx="24" cy="33" r="2.5" fill="#0099C8"/>
 
   <!-- WiFi arc — small -->
-  <path d="M19 30 A5 5 0 0 0 29 30"
+  <path d="M19 27 A5 5 0 0 1 29 27"
         fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round"/>
 
   <!-- WiFi arc — medium -->
-  <path d="M15 30 A9 9 0 0 0 33 30"
+  <path d="M15 27 A9 9 0 0 1 33 27"
         fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
 
   <!-- WiFi arc — large -->
-  <path d="M11 30 A13 13 0 0 0 37 30"
+  <path d="M11 27 A13 13 0 0 1 37 27"
         fill="none" stroke="#0099C8" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
 
   <!-- Wordmark: Talk dark, Net cyan -->
