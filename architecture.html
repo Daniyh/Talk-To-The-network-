@@ -13,10 +13,10 @@
 </head>
 <body>
 
-<svg id="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 645" width="1000" height="645">
+<svg id="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 775" width="1000" height="775">
 
   <!-- Background -->
-  <rect width="1000" height="645" fill="#0A1628" rx="12"/>
+  <rect width="1000" height="775" fill="#0A1628" rx="12"/>
 
   <!-- ══ TITLE ══ -->
   <text x="500" y="26" text-anchor="middle" font-family="Inter,Helvetica Neue,Arial,sans-serif"
@@ -47,8 +47,8 @@
   <!-- Intent AI sub-box -->
   <rect x="401" y="140" width="198" height="82" rx="7" fill="#0A1628" stroke="#00D4FF" stroke-width="1.5"/>
   <text x="500" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Intent AI</text>
-  <text x="500" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL Input · 5-Agent Result Card</text>
-  <text x="500" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Pipeline steps · Safety badge</text>
+  <text x="500" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL Input · Clarification UI</text>
+  <text x="500" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">6-Agent Result · Safety badge</text>
   <text x="500" y="207" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">localStorage persistence</text>
 
   <!-- Dataset sub-box -->
@@ -58,139 +58,173 @@
   <text x="853" y="193" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">6G HetNet · 50 cells</text>
   <text x="853" y="207" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">5 location zones</text>
 
-  <!-- arrow: Intent AI → Backend -->
-  <line x1="500" y1="236" x2="500" y2="260" stroke="#00D4FF" stroke-width="1.5"/>
-  <polygon points="500,262 494,253 506,253" fill="#00D4FF"/>
-  <rect x="510" y="244" width="108" height="14" rx="3" fill="#0A1628"/>
-  <text x="564" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">POST /api/intent</text>
+  <!-- ══ PRE-FLIGHT: arrow from Frontend ══ -->
+  <line x1="500" y1="236" x2="500" y2="254" stroke="#A855F7" stroke-width="1.5"/>
+  <polygon points="500,256 494,247 506,247" fill="#A855F7"/>
+  <rect x="408" y="238" width="124" height="14" rx="3" fill="#0A1628"/>
+  <text x="470" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#A855F7">POST /api/clarify</text>
 
-  <!-- JSON result arrow back (left side) -->
-  <path d="M270 297 L210 297 L210 181 L248 181" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
-  <polygon points="250,181 242,176 242,186" fill="#00E5A0"/>
-  <rect x="168" y="228" width="68" height="14" rx="3" fill="#0A1628"/>
-  <text x="202" y="238" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">JSON result</text>
+  <!-- ══ AGENT 0: CLARIFICATION ══ -->
+  <rect x="200" y="256" width="600" height="110" rx="9" fill="#0D1F35" stroke="#A855F7" stroke-width="1.5"/>
+  <rect x="200" y="256" width="600" height="24" rx="9" fill="#A855F7" fill-opacity="0.15"/>
+  <text x="500" y="273" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#A855F7" letter-spacing="0.8">⓪ CLARIFICATION AGENT · PRE-FLIGHT · /api/clarify</text>
+
+  <!-- Left half: agent details -->
+  <text x="310" y="296" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Clarifier Agent</text>
+  <text x="310" y="313" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Detects ambiguous intents</text>
+  <text x="310" y="327" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Generates up to 2 questions</text>
+  <text x="310" y="341" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#FFB800">Emergency keywords → bypass</text>
+
+  <!-- Divider -->
+  <line x1="500" y1="282" x2="500" y2="354" stroke="#334D6E" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- Right half: conditional outcomes -->
+  <text x="650" y="296" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#E8F4FF">Conditional Flow</text>
+  <rect x="515" y="304" width="265" height="20" rx="4" fill="#A855F7" fill-opacity="0.12" stroke="#A855F7" stroke-width="0.8"/>
+  <text x="648" y="318" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#A855F7">needs_clarification: true → show questions in UI</text>
+  <rect x="515" y="330" width="265" height="20" rx="4" fill="#00E5A0" fill-opacity="0.12" stroke="#00E5A0" stroke-width="0.8"/>
+  <text x="648" y="344" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">needs_clarification: false → proceed immediately</text>
+
+  <!-- Loop-back arrow: clarification → Frontend Questions UI -->
+  <path d="M200 315 L118 315 L118 175 L399 175" stroke="#A855F7" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="401,175 393,170 393,180" fill="#A855F7"/>
+  <rect x="36" y="288" width="80" height="28" rx="3" fill="#0A1628"/>
+  <text x="76" y="300" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#A855F7">Questions shown</text>
+  <text x="76" y="311" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#A855F7">User answers →</text>
+
+  <!-- Arrow down from Agent 0 to Backend -->
+  <line x1="500" y1="366" x2="500" y2="390" stroke="#00D4FF" stroke-width="1.5"/>
+  <polygon points="500,392 494,383 506,383" fill="#00D4FF"/>
+  <rect x="400" y="371" width="160" height="14" rx="3" fill="#0A1628"/>
+  <text x="480" y="381" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">POST /api/intent (enriched)</text>
 
   <!-- ══ BACKEND BOX ══ -->
-  <rect x="270" y="262" width="460" height="68" rx="8" fill="#0D1F35" stroke="#FFB800" stroke-width="1.5"/>
-  <text x="500" y="288" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#E8F4FF">Flask Backend</text>
-  <text x="500" y="305" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Railway · Python · /api/intent  /health · CORS</text>
-  <text x="500" y="320" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#FFB800">Rule-based fallback if Groq API unavailable</text>
+  <rect x="270" y="392" width="460" height="68" rx="8" fill="#0D1F35" stroke="#FFB800" stroke-width="1.5"/>
+  <text x="500" y="418" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#E8F4FF">Flask Backend</text>
+  <text x="500" y="435" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Railway · Python · /api/clarify  /api/intent  /health · CORS</text>
+  <text x="500" y="450" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#FFB800">Rule-based fallback if Groq API unavailable</text>
+
+  <!-- JSON result arrow back to frontend -->
+  <path d="M270 426 L158 426 L158 195 L399 195" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="401,195 393,190 393,200" fill="#00E5A0"/>
+  <rect x="120" y="375" width="68" height="14" rx="3" fill="#0A1628"/>
+  <text x="154" y="385" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">JSON result</text>
 
   <!-- arrow down to pipeline -->
-  <line x1="500" y1="330" x2="500" y2="353" stroke="#334D6E" stroke-width="2"/>
-  <polygon points="500,355 494,346 506,346" fill="#334D6E"/>
+  <line x1="500" y1="460" x2="500" y2="483" stroke="#334D6E" stroke-width="2"/>
+  <polygon points="500,485 494,476 506,476" fill="#334D6E"/>
 
   <!-- ══ PIPELINE LAYER ══ -->
-  <rect x="22" y="355" width="956" height="148" rx="10" fill="#0D1F35" stroke="#334D6E" stroke-width="1.5" stroke-dasharray="5 3"/>
-  <text x="35" y="373" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1.5">CREWAI PIPELINE · GROQ LLAMA 3.3 70B · SEQUENTIAL</text>
+  <rect x="22" y="485" width="956" height="148" rx="10" fill="#0D1F35" stroke="#334D6E" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="35" y="503" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1.5">CREWAI PIPELINE · GROQ LLAMA 3.3 70B · SEQUENTIAL · AGENTS ①–⑤</text>
 
   <!-- Agent 1: Intent Parser -->
-  <rect x="38" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#00D4FF" stroke-width="1.5"/>
-  <rect x="38" y="382" width="170" height="22" rx="7" fill="#00D4FF" fill-opacity="0.12"/>
-  <text x="123" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00D4FF" letter-spacing="0.5">① INTENT PARSER</text>
-  <text x="123" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Intent Parser</text>
-  <text x="123" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL → structured JSON</text>
-  <text x="123" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">slice · priority · users</text>
-  <text x="123" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency · bandwidth</text>
-  <text x="123" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location hint</text>
+  <rect x="38" y="512" width="170" height="106" rx="7" fill="#0A1628" stroke="#00D4FF" stroke-width="1.5"/>
+  <rect x="38" y="512" width="170" height="22" rx="7" fill="#00D4FF" fill-opacity="0.12"/>
+  <text x="123" y="527" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00D4FF" letter-spacing="0.5">① INTENT PARSER</text>
+  <text x="123" y="547" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Intent Parser</text>
+  <text x="123" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">NL → structured JSON</text>
+  <text x="123" y="577" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">slice · priority · users</text>
+  <text x="123" y="591" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency · bandwidth</text>
+  <text x="123" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location hint</text>
 
   <!-- arrow 1→2 -->
-  <line x1="208" y1="435" x2="222" y2="435" stroke="#334D6E" stroke-width="1.5"/>
-  <polygon points="224,435 216,430 216,440" fill="#334D6E"/>
+  <line x1="208" y1="565" x2="222" y2="565" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="224,565 216,560 216,570" fill="#334D6E"/>
 
   <!-- Agent 2: RAN Planner -->
-  <rect x="224" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
-  <rect x="224" y="382" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
-  <text x="309" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">② RAN PLANNER</text>
-  <text x="309" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Planner</text>
-  <text x="309" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">3GPP R18 config</text>
-  <text x="309" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">MIMO · slicing · 5QI</text>
-  <text x="309" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">scheduler · numerology</text>
-  <text x="309" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">carrier aggregation</text>
+  <rect x="224" y="512" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <rect x="224" y="512" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
+  <text x="309" y="527" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">② RAN PLANNER</text>
+  <text x="309" y="547" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Planner</text>
+  <text x="309" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">3GPP R18 config</text>
+  <text x="309" y="577" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">MIMO · slicing · 5QI</text>
+  <text x="309" y="591" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">scheduler · numerology</text>
+  <text x="309" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">carrier aggregation</text>
 
   <!-- arrow 2→3 -->
-  <line x1="394" y1="435" x2="408" y2="435" stroke="#334D6E" stroke-width="1.5"/>
-  <polygon points="410,435 402,430 402,440" fill="#334D6E"/>
+  <line x1="394" y1="565" x2="408" y2="565" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="410,565 402,560 402,570" fill="#334D6E"/>
 
   <!-- Agent 3: Safety Validator -->
-  <rect x="410" y="382" width="180" height="106" rx="7" fill="#0A1628" stroke="#FFB800" stroke-width="1.5"/>
-  <rect x="410" y="382" width="180" height="22" rx="7" fill="#FFB800" fill-opacity="0.12"/>
-  <text x="500" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#FFB800" letter-spacing="0.5">③ SAFETY VALIDATOR</text>
-  <text x="500" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Safety Validator</text>
-  <text x="500" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">bandwidth ≤ 1000 Mbps</text>
-  <text x="500" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency feasibility</text>
-  <text x="500" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">capacity check</text>
-  <text x="500" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">QoS consistency</text>
+  <rect x="410" y="512" width="180" height="106" rx="7" fill="#0A1628" stroke="#FFB800" stroke-width="1.5"/>
+  <rect x="410" y="512" width="180" height="22" rx="7" fill="#FFB800" fill-opacity="0.12"/>
+  <text x="500" y="527" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#FFB800" letter-spacing="0.5">③ SAFETY VALIDATOR</text>
+  <text x="500" y="547" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Safety Validator</text>
+  <text x="500" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">bandwidth ≤ 1000 Mbps</text>
+  <text x="500" y="577" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">latency feasibility</text>
+  <text x="500" y="591" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">capacity check</text>
+  <text x="500" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">QoS consistency</text>
 
   <!-- arrow 3→4 -->
-  <line x1="590" y1="435" x2="604" y2="435" stroke="#334D6E" stroke-width="1.5"/>
-  <polygon points="606,435 598,430 598,440" fill="#334D6E"/>
+  <line x1="590" y1="565" x2="604" y2="565" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="606,565 598,560 598,570" fill="#334D6E"/>
 
   <!-- Agent 4: Network Monitor -->
-  <rect x="606" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
-  <rect x="606" y="382" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
-  <text x="691" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">④ NETWORK MONITOR</text>
-  <text x="691" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Network Monitor</text>
-  <text x="691" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">reads CSV dataset</text>
-  <text x="691" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">KPI health score</text>
-  <text x="691" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">violation detection</text>
-  <text x="691" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location filtering</text>
+  <rect x="606" y="512" width="170" height="106" rx="7" fill="#0A1628" stroke="#334D6E" stroke-width="1"/>
+  <rect x="606" y="512" width="170" height="22" rx="7" fill="#334D6E" fill-opacity="0.4"/>
+  <text x="691" y="527" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7B9DB5" letter-spacing="0.5">④ NETWORK MONITOR</text>
+  <text x="691" y="547" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">Network Monitor</text>
+  <text x="691" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">reads CSV dataset</text>
+  <text x="691" y="577" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">KPI health score</text>
+  <text x="691" y="591" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">violation detection</text>
+  <text x="691" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">location filtering</text>
 
   <!-- arrow 4→5 -->
-  <line x1="776" y1="435" x2="790" y2="435" stroke="#334D6E" stroke-width="1.5"/>
-  <polygon points="792,435 784,430 784,440" fill="#334D6E"/>
+  <line x1="776" y1="565" x2="790" y2="565" stroke="#334D6E" stroke-width="1.5"/>
+  <polygon points="792,565 784,560 784,570" fill="#334D6E"/>
 
   <!-- Agent 5: RAN Optimizer -->
-  <rect x="792" y="382" width="170" height="106" rx="7" fill="#0A1628" stroke="#00E5A0" stroke-width="1.5"/>
-  <rect x="792" y="382" width="170" height="22" rx="7" fill="#00E5A0" fill-opacity="0.12"/>
-  <text x="877" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00E5A0" letter-spacing="0.5">⑤ RAN OPTIMIZER</text>
-  <text x="877" y="417" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Optimizer</text>
-  <text x="877" y="433" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">action selection</text>
-  <text x="877" y="447" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">before/after KPIs</text>
-  <text x="877" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">improvement %</text>
-  <text x="877" y="475" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">SON strategies</text>
+  <rect x="792" y="512" width="170" height="106" rx="7" fill="#0A1628" stroke="#00E5A0" stroke-width="1.5"/>
+  <rect x="792" y="512" width="170" height="22" rx="7" fill="#00E5A0" fill-opacity="0.12"/>
+  <text x="877" y="527" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00E5A0" letter-spacing="0.5">⑤ RAN OPTIMIZER</text>
+  <text x="877" y="547" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#E8F4FF">RAN Optimizer</text>
+  <text x="877" y="563" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">action selection</text>
+  <text x="877" y="577" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">before/after KPIs</text>
+  <text x="877" y="591" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">improvement %</text>
+  <text x="877" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">SON strategies</text>
 
   <!-- ══ EXTERNAL SERVICES ══ -->
 
   <!-- Groq API -->
-  <rect x="68" y="548" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00D4FF" stroke-width="1.5"/>
-  <text x="183" y="572" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Groq API</text>
-  <text x="183" y="589" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Llama 3.3 70B Versatile</text>
-  <text x="183" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference · All 5 agents</text>
+  <rect x="68" y="678" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="183" y="702" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">Groq API</text>
+  <text x="183" y="719" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">Llama 3.3 70B Versatile</text>
+  <text x="183" y="735" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference · All 6 agents</text>
 
   <!-- CSV Dataset -->
-  <rect x="702" y="548" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00E5A0" stroke-width="1.5"/>
-  <text x="817" y="572" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">6G HetNet Dataset</text>
-  <text x="817" y="589" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">CSV · 50 cells · 5 zones</text>
-  <text x="817" y="605" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Agents 4 &amp; 5 · Frontend polling</text>
+  <rect x="702" y="678" width="230" height="72" rx="8" fill="#0D1F35" stroke="#00E5A0" stroke-width="1.5"/>
+  <text x="817" y="702" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#E8F4FF">6G HetNet Dataset</text>
+  <text x="817" y="719" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7B9DB5">CSV · 50 cells · 5 zones</text>
+  <text x="817" y="735" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Agents 4 &amp; 5 · Frontend polling</text>
 
-  <!-- Arrow: Pipeline → Groq (dashed, from agent 1 bottom) -->
-  <path d="M123 488 L123 518 L183 518 L183 548" stroke="#00D4FF" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
-  <polygon points="183,550 177,541 189,541" fill="#00D4FF"/>
-  <rect x="88" y="508" width="60" height="14" rx="3" fill="#0A1628"/>
-  <text x="118" y="518" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">LLM calls</text>
+  <!-- Arrow: Pipeline → Groq -->
+  <path d="M123 618 L123 648 L183 648 L183 678" stroke="#00D4FF" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="183,680 177,671 189,671" fill="#00D4FF"/>
+  <rect x="88" y="638" width="60" height="14" rx="3" fill="#0A1628"/>
+  <text x="118" y="648" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00D4FF">LLM calls</text>
 
-  <!-- Arrow: Agent 4 → CSV (dashed) -->
-  <path d="M691 488 L691 518 L817 518 L817 548" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
-  <polygon points="817,550 811,541 823,541" fill="#00E5A0"/>
-  <rect x="726" y="508" width="60" height="14" rx="3" fill="#0A1628"/>
-  <text x="756" y="518" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">CSV reads</text>
+  <!-- Arrow: Agent 4 → CSV -->
+  <path d="M691 618 L691 648 L817 648 L817 678" stroke="#00E5A0" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+  <polygon points="817,680 811,671 823,671" fill="#00E5A0"/>
+  <rect x="726" y="638" width="60" height="14" rx="3" fill="#0A1628"/>
+  <text x="756" y="648" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00E5A0">CSV reads</text>
 
   <!-- ══ LEGEND ══ -->
-  <rect x="330" y="548" width="340" height="72" rx="8" fill="#0D1F35" stroke="#334D6E" stroke-width="1"/>
-  <text x="500" y="567" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1">LEGEND</text>
-  <line x1="348" y1="580" x2="368" y2="580" stroke="#00D4FF" stroke-width="1.5"/>
-  <text x="372" y="584" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">REST API call</text>
-  <line x1="348" y1="596" x2="368" y2="596" stroke="#00E5A0" stroke-width="1.5"/>
-  <text x="372" y="600" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Response / data read</text>
-  <line x1="438" y1="580" x2="458" y2="580" stroke="#00D4FF" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="462" y="584" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference</text>
-  <line x1="438" y1="596" x2="458" y2="596" stroke="#00E5A0" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <text x="462" y="600" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">CSV data read</text>
-  <rect x="528" y="573" width="10" height="10" rx="2" fill="#FFB800" fill-opacity="0.3" stroke="#FFB800" stroke-width="1"/>
-  <text x="542" y="582" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Safety gate</text>
-  <rect x="528" y="589" width="10" height="10" rx="2" fill="#00E5A0" fill-opacity="0.3" stroke="#00E5A0" stroke-width="1"/>
-  <text x="542" y="598" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Output / result</text>
+  <rect x="330" y="678" width="340" height="72" rx="8" fill="#0D1F35" stroke="#334D6E" stroke-width="1"/>
+  <text x="500" y="697" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4A6A8A" letter-spacing="1">LEGEND</text>
+  <line x1="348" y1="710" x2="368" y2="710" stroke="#00D4FF" stroke-width="1.5"/>
+  <text x="372" y="714" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">REST API call</text>
+  <line x1="348" y1="726" x2="368" y2="726" stroke="#00E5A0" stroke-width="1.5"/>
+  <text x="372" y="730" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Response / data read</text>
+  <line x1="438" y1="710" x2="458" y2="710" stroke="#00D4FF" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="462" y="714" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">LLM inference</text>
+  <line x1="438" y1="726" x2="458" y2="726" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="462" y="730" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Clarification loop</text>
+  <rect x="528" y="703" width="10" height="10" rx="2" fill="#FFB800" fill-opacity="0.3" stroke="#FFB800" stroke-width="1"/>
+  <text x="542" y="712" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Safety gate</text>
+  <rect x="528" y="719" width="10" height="10" rx="2" fill="#A855F7" fill-opacity="0.3" stroke="#A855F7" stroke-width="1"/>
+  <text x="542" y="728" font-family="Inter,sans-serif" font-size="9" fill="#7B9DB5">Pre-flight agent</text>
 
 </svg>
 
@@ -200,7 +234,7 @@
   function downloadDiagram() {
     const svg = document.getElementById('diagram');
     const canvas = document.createElement('canvas');
-    canvas.width = 1000; canvas.height = 645;
+    canvas.width = 1000; canvas.height = 775;
     const ctx = canvas.getContext('2d');
     const data = new XMLSerializer().serializeToString(svg);
     const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });

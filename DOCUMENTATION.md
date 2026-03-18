@@ -5,7 +5,7 @@
 
 > **Abstract**
 >
-> The RAN Optimization Dashboard is a full-stack, AI-powered web application that brings the principles of Intent-Based Networking (IBN) to life in a 5G Advanced Radio Access Network (RAN) environment. Network engineers express their operational goals in plain natural language — such as *"Prioritize emergency communications at the central hospital now"* — and a four-stage autonomous AI pipeline transforms that intent into a structured, standards-compliant network optimization plan. The system analyzes real network KPIs drawn from a 6G Heterogeneous Network dataset, generates 3GPP Release 18 configurations, visualizes affected cells on an interactive topology map, and quantifies the performance improvement through before/after KPI comparisons. This document covers the theoretical foundations, system architecture, implementation details, dataset requirements, API specification, and deployment procedures.
+> The RAN Optimization Dashboard — branded **TalkNet** — is a full-stack, AI-powered web application that brings the principles of Intent-Based Networking (IBN) to life in a 5G Advanced Radio Access Network (RAN) environment. Network engineers express their operational goals in plain natural language — such as *"Prioritize emergency communications at the central hospital now"* — and a six-agent autonomous AI pipeline transforms that intent into a structured, standards-compliant network optimization plan. A pre-flight Clarification Agent (Agent 0) first checks whether the intent is sufficiently clear before triggering the five-agent main pipeline. The system analyzes real network KPIs drawn from a 6G Heterogeneous Network dataset, generates 3GPP Release 18 configurations, validates safety constraints, visualizes affected cells on an interactive topology map, and quantifies the performance improvement through before/after KPI comparisons. This document covers the theoretical foundations, system architecture, implementation details, dataset requirements, API specification, and deployment procedures.
 
 ---
 
@@ -25,7 +25,7 @@
 5. [Project Structure](#5-project-structure)
 6. [Setup and Installation](#6-setup-and-installation)
 7. [Dataset Requirements](#7-dataset-requirements)
-8. [AI Pipeline — The Four-Agent Crew](#8-ai-pipeline--the-four-agent-crew)
+8. [AI Pipeline — The Six-Agent Crew](#8-ai-pipeline--the-six-agent-crew)
 9. [API Reference](#9-api-reference)
 10. [Frontend Pages](#10-frontend-pages)
 11. [Deployment](#11-deployment)

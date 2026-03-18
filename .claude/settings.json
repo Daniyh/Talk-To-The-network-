@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "C:\\Users\\danyh\\_tmp_ran_clone"
+    ],
+    "allow": [
+      "Read(//c/Users/danyh/AppData/Local/Temp/claude/c--Users-danyh-ran-dashboard-backend/tasks/**)"
+    ]
+  }
+}
