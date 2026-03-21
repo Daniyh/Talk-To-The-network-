@@ -41,7 +41,7 @@ export default function NetworkMonitorPage() {
         <div>
           <h1 className="text-lg font-semibold text-text-primary">Network Monitor</h1>
           <p className="text-xs text-text-secondary mt-0.5">
-            Agentic AI 5G_Advanced Network optimization
+             Agentic AI-Based 5G-Advanced Network Optimization
           </p>
         </div>
         <div className="flex items-center gap-4">
